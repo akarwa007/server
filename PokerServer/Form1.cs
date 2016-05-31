@@ -22,7 +22,17 @@ namespace PokerServer
             this.MaximizeBox = false;
             Table t = new Table(4);
             Deck d = Deck.GetShuffledDeck();
-            d.PrintDeck();
+            Tuple<Card, Card, Card, Card, Card> hand = new Tuple<Card, Card, Card, Card, Card>(
+                                                        new Card(Suit.Diamond,Rank.Nine),
+                                                        new Card(Suit.Club,Rank.King),
+                                                        new Card(Suit.Club,Rank.Queen),
+                                                        new Card(Suit.Club,Rank.Jack),
+                                                        new Card(Suit.Club,Rank.Ten)
+                                                        );
+            HandRankings h = new HandRankings(hand);
+
+
+          
         }
     }
 }

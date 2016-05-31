@@ -54,6 +54,7 @@
     </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="GameManager.cs" />
+    <Compile Include="HandRankings.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

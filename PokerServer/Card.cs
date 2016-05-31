@@ -34,7 +34,7 @@ namespace PokerServer
     }
     public enum Rank
     {
-        Ace,
+        Ace = 0,
         Two,
         Three,
         Four,
