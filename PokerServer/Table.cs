@@ -116,6 +116,10 @@ namespace PokerServer
             
            return _seats[nextseat];
         }
+        public void ResetToSmallBlind()
+        {
+             this._currentPosition = SmallBlind_Position;
+        }
       
     }
 

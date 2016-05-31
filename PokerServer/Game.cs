@@ -16,6 +16,7 @@ namespace PokerServer
         private Tuple<Card, Card, Card, Card, Card> _board;
         private decimal _minStartingChipsPerPlayer;
         private decimal _maxStartingChipsPerPlayer;
+        private decimal _potSize = 0;
         public Game(decimal minChips, decimal maxChips)
         {
             if (minChips < 0)
@@ -64,6 +65,20 @@ namespace PokerServer
             _river = river;
             _board = new Tuple<Card, Card, Card, Card, Card>(_flop.Item1, _flop.Item2, _flop.Item3, _turn, _river);
             return river;
+        }
+        public decimal AddToPot(decimal amount)
+        {
+            if (amount < 0)
+                throw new Exception("Pot amount cannot be negative");
+            _potSize += amount;
+            return _potSize;
+        }
+        public decimal PotSize
+        {
+            get
+            {
+                return _potSize;
+            }
         }
     }
 }

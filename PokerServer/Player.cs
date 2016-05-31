@@ -11,6 +11,7 @@ namespace PokerServer
         private static object _synchronize = new object();
         private decimal _chipcount = 0;
         private Tuple<Card, Card> _holecards;
+        private bool _playerStillInHand = false;
         public Player()
         {
         }
@@ -21,6 +22,22 @@ namespace PokerServer
         public void AssignHoleCards(Tuple<Card,Card> holecards)
         {
             _holecards = holecards;
+            _playerStillInHand = true;
+        }
+        public bool InHand
+        {
+            get
+            {
+                return _playerStillInHand;
+            }
+        }
+        public void FoldHand()
+        {
+            _playerStillInHand = false;
+        }
+        public void Bet(decimal betamount)
+        {
+            RemoveMoney(betamount);
         }
         public void AddMoney(decimal money)
         {
