@@ -86,9 +86,7 @@ namespace PokerServer
             get
             {
                 int fullseatcount = _seats.Count();
-
                 return (_dealerPosition + 1) % fullseatcount;
-
             }
         }
         public int BigBlind_Position
@@ -96,9 +94,7 @@ namespace PokerServer
             get
             {
                 int fullseatcount = _seats.Count();
-
                 return (_dealerPosition + 2) % fullseatcount;
-
             }
         }
         public int PlayerCount()
