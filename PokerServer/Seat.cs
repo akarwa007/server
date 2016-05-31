@@ -10,18 +10,29 @@ namespace PokerServer
     {
         private Player _player;
         private Table _table;
+        private short _seatno;
 
-        public Seat(Player p , Table t)
+        public Seat(Player p , Table t, short SeatNum)
         {
             _player = p;
             _table = t;
+            _seatno = SeatNum;
+            
         }
 
-
-        public bool RemovePlayer()
+        public short SeatNumber
         {
-            _player = null;
-            return true;
+            get { return _seatno; }
+        }
+        public bool RemovePlayer(Player p)
+        {
+            if (_player == p)
+            {
+                _player = null;
+                return true;
+            }
+            throw new Exception("Trying to remove a player not seated on the seat");
+            
            // throw new NotImplementedException();
         }
 
@@ -31,10 +42,15 @@ namespace PokerServer
             return true;
           //  throw new NotImplementedException();
         }
+        public bool IsEmpty()
+        {
+            return (_player == null);
+        }
+    
     }
     public interface ISeat
     {
-        bool RemovePlayer();
+        bool RemovePlayer(Player p);
         bool SeatPlayer(Player p);
 
     }

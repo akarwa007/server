@@ -14,8 +14,14 @@ namespace PokerServer
         private Card _turn;
         private Card _river;
         private Tuple<Card, Card, Card, Card, Card> _board;
-        public Game()
+        private decimal _minStartingChipsPerPlayer;
+        private decimal _maxStartingChipsPerPlayer;
+        public Game(decimal minChips, decimal maxChips)
         {
+            if (minChips < 0)
+                throw new Exception("Min chips per person cannot be negative");
+            _minStartingChipsPerPlayer = minChips;
+            _maxStartingChipsPerPlayer = maxChips;
         }
         private void initialize()
         {

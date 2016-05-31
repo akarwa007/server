@@ -10,12 +10,17 @@ namespace PokerServer
     {
         private static object _synchronize = new object();
         private decimal _chipcount = 0;
+        private Tuple<Card, Card> _holecards;
         public Player()
         {
         }
         private void initialize()
         {
 
+        }
+        public void AssignHoleCards(Tuple<Card,Card> holecards)
+        {
+            _holecards = holecards;
         }
         public void AddMoney(decimal money)
         {
