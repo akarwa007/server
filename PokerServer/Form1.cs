@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PokerServer
+namespace Poker.Server
 {
     public partial class Form1 : Form
     {
@@ -30,7 +30,7 @@ namespace PokerServer
                                                         new Card(Suit.Club,Rank.Ten)
                                                         );
             HandRankings h = new HandRankings(hand);
-
+            Console.WriteLine(d.serialize());
 
           
         }

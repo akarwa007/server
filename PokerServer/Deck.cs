@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Web.Script.Serialization;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
-namespace PokerServer
+namespace Poker.Server
 {
     public class Deck 
     {
@@ -90,8 +93,18 @@ namespace PokerServer
         {
             throw new NotImplementedException();
         }
+        public Card[] cards
+        {
+            get { return _cards; }
+            set { _cards = value; }
+        }
+        public string serialize()
+        {
+            var json = new JavaScriptSerializer();
+            var json1 = Newtonsoft.Json.JsonConvert.SerializeObject(this);
 
-     
+            return json1;
+        }
         public Card GetNext()
         {
             Card result =  Current;

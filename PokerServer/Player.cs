@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
-namespace PokerServer
+namespace Poker.Server
 {
     public class Player
     {
@@ -14,10 +16,16 @@ namespace PokerServer
         private bool _playerStillInHand = false;
         public Player()
         {
+            
         }
         private void initialize()
         {
 
+        }
+        public string  serialize()
+        {
+            var string1 = "";
+            return string1;
         }
         public void AssignHoleCards(Tuple<Card,Card> holecards)
         {

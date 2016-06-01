@@ -1,4 +1,4 @@
-﻿namespace PokerServer
+﻿namespace Poker.Server
 {
     partial class Form1
     {
