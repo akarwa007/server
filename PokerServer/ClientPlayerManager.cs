@@ -11,18 +11,19 @@ namespace Poker.Server
         public ClientPlayerManager()
         {
         }
-        public static void RequestAction(Player p)
+        public  void RequestAction(Player p)
         { 
             // this will wait with the client player and seek an action 
 
+
         }
-        public static void SendFlop(Table t, Tuple<Card,Card,Card> flop)
+        public  void SendFlop(Table t, Tuple<Card,Card,Card> flop)
         {
         }
-        public static void SendTurn(Table t, Card turn)
+        public  void SendTurn(Table t, Card turn)
         {
         }
-        public static void SendRiver(Table t, Card river)
+        public  void SendRiver(Table t, Card river)
         {
         }
     }

@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Poker.Shared;
+using Poker.Gateway;
 
 namespace Poker.Server
 {
@@ -34,5 +36,18 @@ namespace Poker.Server
 
           
         }
+
+        private void Form1_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnStartServer1_Click(object sender, EventArgs e)
+        {
+            TCPConnector conn = new TCPConnector();
+            conn.start();
+        }
+
+      
     }
 }

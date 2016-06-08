@@ -28,21 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.btnStartServer1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
+            // 
+            // btnStartServer1
+            // 
+            this.btnStartServer1.Location = new System.Drawing.Point(39, 27);
+            this.btnStartServer1.Name = "btnStartServer1";
+            this.btnStartServer1.Size = new System.Drawing.Size(155, 82);
+            this.btnStartServer1.TabIndex = 0;
+            this.btnStartServer1.Text = "Start Server";
+            this.btnStartServer1.UseVisualStyleBackColor = true;
+            this.btnStartServer1.Click += new System.EventHandler(this.btnStartServer1_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(711, 306);
+            this.ClientSize = new System.Drawing.Size(652, 295);
+            this.Controls.Add(this.btnStartServer1);
             this.Name = "Form1";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.Form1_Load_1);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Button btnStartServer;
+        private System.Windows.Forms.Button btnStartServer1;
     }
 }
 

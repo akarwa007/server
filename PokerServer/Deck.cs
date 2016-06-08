@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Poker.Shared;
 
 namespace Poker.Server
 {

@@ -14,9 +14,10 @@ namespace Poker.Server
         private decimal _chipcount = 0;
         private Tuple<Card, Card> _holecards;
         private bool _playerStillInHand = false;
-        public Player()
+        private string _username;
+        public Player(string username)
         {
-            
+            _username = username;
         }
         private void initialize()
         {
