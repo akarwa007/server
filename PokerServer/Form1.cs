@@ -14,6 +14,7 @@ namespace Poker.Server
 {
     public partial class Form1 : Form
     {
+        private object _locker = new object();
         public Form1()
         {
             InitializeComponent();
@@ -44,8 +45,25 @@ namespace Poker.Server
 
         private void btnStartServer1_Click(object sender, EventArgs e)
         {
-            TCPConnector conn = new TCPConnector();
+            TCPConnector conn = new TCPConnector(new Action<String>(AppendTextBox));
             conn.start();
+        }
+        public void AppendTextBox(string value)
+        {
+          
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
+                    return;
+                }
+               // this.textBox1.Text += value;
+                this.textBox1.AppendText(value);
+           
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
       

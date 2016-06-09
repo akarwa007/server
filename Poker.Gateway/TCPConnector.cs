@@ -20,10 +20,10 @@ namespace Poker.Gateway
         private Dictionary<TcpClient, Queue<Message>> _writer_queue = new Dictionary<TcpClient, Queue<Message>>();
 
         private MessageProcessor _MP = new MessageProcessor();
-
-        public TCPConnector()
+        private Action<String> _funcStream;
+        public TCPConnector(Action<String> func)
         {
-
+            _funcStream = func;
         }
         public void start()
         {
@@ -32,7 +32,8 @@ namespace Poker.Gateway
         }
         private void startasync()
         {
-            TcpListener listener = new TcpListener(8113);
+            System.Net.IPAddress ipAddress = System.Net.IPAddress.Parse("127.0.0.1");
+            TcpListener listener = new TcpListener(ipAddress,8113);
             listener.Start(100);
             while (listen)
             {
@@ -44,16 +45,17 @@ namespace Poker.Gateway
         }
         private void forknewthread(TcpClient client)
         {
+            _funcStream("Incoming new client request");
             Thread readerthread = new Thread(
                () => func_reader(client));
             _clients_readers.Add(client,readerthread);
-
+            readerthread.Name = "ReaderThread";
             readerthread.Start();
 
             Thread writerthread = new Thread(
               () => func_writer(client));
             _clients_writers.Add(client, writerthread);
-
+            writerthread.Name = "WriterThread";
             writerthread.Start();
         }
         private void func(TcpClient client)
@@ -66,11 +68,29 @@ namespace Poker.Gateway
         private void func_reader(TcpClient client)
         {
             NetworkStream ns = client.GetStream();
-            StreamReader sr = new StreamReader(ns);
+            StreamReader reader = new StreamReader(ns);
+            MemoryStream ms = new MemoryStream();
             while (client.Connected)
             {
-                String message = sr.ReadToEnd();
-                _MP.Process(message);
+                try
+                {
+                    
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                       // Console.WriteLine(line);
+                        _funcStream(line);
+                    }
+
+                    string message = line;
+                        //= System.Text.Encoding.UTF8.GetString(output);
+                    _MP.Process(message);
+                    _funcStream(message);
+                }
+                catch
+                {
+                }
+               
             }
 
         }
