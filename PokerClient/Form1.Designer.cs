@@ -34,6 +34,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
+            this.btnSubmit1 = new System.Windows.Forms.Button();
+            this.btbSubmit2 = new System.Windows.Forms.Button();
+            this.btnSubmit3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -44,6 +47,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "Start Client";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -53,6 +57,7 @@
             this.button2.TabIndex = 1;
             this.button2.Text = "Start Client";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
@@ -62,6 +67,7 @@
             this.button3.TabIndex = 2;
             this.button3.Text = "Start Client";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // textBox1
             // 
@@ -87,11 +93,44 @@
             this.textBox3.Size = new System.Drawing.Size(198, 186);
             this.textBox3.TabIndex = 5;
             // 
+            // btnSubmit1
+            // 
+            this.btnSubmit1.Location = new System.Drawing.Point(83, 301);
+            this.btnSubmit1.Name = "btnSubmit1";
+            this.btnSubmit1.Size = new System.Drawing.Size(79, 23);
+            this.btnSubmit1.TabIndex = 6;
+            this.btnSubmit1.Text = "Submit";
+            this.btnSubmit1.UseVisualStyleBackColor = true;
+            this.btnSubmit1.Click += new System.EventHandler(this.btnSubmit1_Click);
+            // 
+            // btbSubmit2
+            // 
+            this.btbSubmit2.Location = new System.Drawing.Point(288, 301);
+            this.btbSubmit2.Name = "btbSubmit2";
+            this.btbSubmit2.Size = new System.Drawing.Size(79, 23);
+            this.btbSubmit2.TabIndex = 7;
+            this.btbSubmit2.Text = "Submit";
+            this.btbSubmit2.UseVisualStyleBackColor = true;
+            this.btbSubmit2.Click += new System.EventHandler(this.btbSubmit2_Click);
+            // 
+            // btnSubmit3
+            // 
+            this.btnSubmit3.Location = new System.Drawing.Point(495, 301);
+            this.btnSubmit3.Name = "btnSubmit3";
+            this.btnSubmit3.Size = new System.Drawing.Size(79, 23);
+            this.btnSubmit3.TabIndex = 8;
+            this.btnSubmit3.Text = "Submit";
+            this.btnSubmit3.UseVisualStyleBackColor = true;
+            this.btnSubmit3.Click += new System.EventHandler(this.btnSubmit3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(655, 331);
+            this.Controls.Add(this.btnSubmit3);
+            this.Controls.Add(this.btbSubmit2);
+            this.Controls.Add(this.btnSubmit1);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
@@ -113,5 +152,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Button btnSubmit1;
+        private System.Windows.Forms.Button btbSubmit2;
+        private System.Windows.Forms.Button btnSubmit3;
     }
 }
