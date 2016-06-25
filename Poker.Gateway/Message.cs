@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 
 namespace Poker.Gateway
 {
@@ -10,17 +13,56 @@ namespace Poker.Gateway
     {
         MessageType _messageType;
         MessageDirection _messageDirection;
+        String _content;
 
-        public Message()
+        public Message(String content, MessageType mtype)
         {
+            _content = content;
+            _messageType = mtype;
+        }
+        public String Content
+        {
+            get
+            {
+                return _content;
+            }
+            private set
+            {
+                _content = value;
+            }
+        }
+        public MessageDirection MessageDirection
+        {
+            get
+            {
+                return _messageDirection;
+            }
+            private set
+            {
+                _messageDirection = value;
+            }
+        }
+        public MessageType MessageType
+        {
+            get
+            {
+                return _messageType;
+            }
+            private set
+            {
+                _messageType = value;
+            }
         }
         public String Serialize()
         {
-            return "Not implemented";
+            return JsonConvert.SerializeObject(this);
         }
-        public void DeSerialize(String s)
+        public static Message DeSerialize(String jsonString)
         {
+            Message m = JsonConvert.DeserializeObject<Message>(jsonString);
+            return m;
         }
+       
     }
     public enum MessageType
     {

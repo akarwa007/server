@@ -14,32 +14,39 @@ namespace Poker.Server
         private short _capacity = 9;
         private Dictionary<Seat, Player> _seats;
         private int _dealerPosition;
+        private string _gameName; // e.g Texas Holdem
+        private string _gameSubName; // e.g No Limit
+        private string _gameValue; // e.g  2-5
+        private string _tableNo; // e.g 45
+        private Game _game;
+        public static int TableNumber = 1;
         
         private int _currentPosition = 1; // seat numbers start with 1
-        public Table()
+        public Table(short capacity , string gamename, string gamesubname , string gamevalue, decimal minchips , decimal maxchips )
         {
-            initialize();
-            Console.WriteLine("default table cons with capacity of " + this._capacity);
-        }
-        public Table(short capacity)
-        {
+            _gameName = gamename;
+            _gameSubName = gamesubname;
+            _gameValue = gamevalue;
+            _game = new Game(minchips, maxchips);
+            _tableNo = "Table" + Table.TableNumber++;
             if ((capacity < 2) || (capacity > 10))
                 throw new Exception("Capacity cannot be less than 2 or greater than 10");
             _capacity = capacity;
             initialize();
-            Console.WriteLine("parameterized table cons with capcity of " + this._capacity );
+            Console.WriteLine("default table cons with capacity of " + this._capacity);
         }
+    
         private void initialize()
         {
             _seats = new Dictionary<Seat, Player>();
             short count = this._capacity;
             short seatno = 1;
+            Player empty = new Player("Empty");
             while (count > 0)
             {
-                _seats.Add(new Seat(null, this, seatno++), null);
-                count++;
+                _seats.Add(new Seat(empty, this, seatno++), empty);
+                count--;
             }
-
 
         }
 
@@ -72,6 +79,13 @@ namespace Poker.Server
                 }
             }
         }
+        public Dictionary<Seat, Player> Seats
+        {
+            get
+            {
+                return _seats;
+            }
+        }
         public int DealerPosition
         {
             get { return _dealerPosition; }
@@ -97,6 +111,50 @@ namespace Poker.Server
             {
                 int fullseatcount = _seats.Count();
                 return (_dealerPosition + 2) % fullseatcount;
+            }
+        }
+        public string GameName
+        {
+            get
+            {
+                return _gameName;
+            }
+            set
+            {
+                _gameName = value;
+            }
+        }
+        public string GameSubName
+        {
+            get
+            {
+                return _gameSubName;
+            }
+            set
+            {
+                _gameSubName = value;
+            }
+        }
+        public string GameValue
+        {
+            get
+            {
+                return _gameValue;
+            }
+            set
+            {
+                _gameValue = value;
+            }
+        }
+        public string TableNo
+        {
+            get
+            {
+                return _tableNo;
+            }
+            set
+            {
+                _tableNo = value;
             }
         }
         public int PlayerCount()

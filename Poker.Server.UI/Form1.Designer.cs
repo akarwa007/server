@@ -30,6 +30,7 @@
         {
             this.btnStartServer1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.btSendCasinoUpdate = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnStartServer1
@@ -51,9 +52,20 @@
             this.textBox1.TabIndex = 1;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
+            // btSendCasinoUpdate
+            // 
+            this.btSendCasinoUpdate.Location = new System.Drawing.Point(12, 135);
+            this.btSendCasinoUpdate.Name = "btSendCasinoUpdate";
+            this.btSendCasinoUpdate.Size = new System.Drawing.Size(155, 39);
+            this.btSendCasinoUpdate.TabIndex = 2;
+            this.btSendCasinoUpdate.Text = "Send Casino Update";
+            this.btSendCasinoUpdate.UseVisualStyleBackColor = true;
+            this.btSendCasinoUpdate.Click += new System.EventHandler(this.btSendCasinoUpdate_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(652, 295);
+            this.Controls.Add(this.btSendCasinoUpdate);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnStartServer1);
             this.Name = "Form1";
@@ -68,6 +80,7 @@
         private System.Windows.Forms.Button btnStartServer;
         private System.Windows.Forms.Button btnStartServer1;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button btSendCasinoUpdate;
     }
 }
 

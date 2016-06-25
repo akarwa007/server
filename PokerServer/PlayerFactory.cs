@@ -9,20 +9,23 @@ namespace Poker.Server
     public sealed class PlayerFactory
     {
         private static object _locker = new object();
-        private PlayerFactory _instance;
+        private static PlayerFactory _instance;
         private List<Player> _playerList;
 
         private PlayerFactory()
         {
             _playerList = new List<Player>();
         }
-        public PlayerFactory Instance()
+        public static PlayerFactory Instance
         {
-            lock (_locker)
+            get
             {
-                if (_instance == null)
-                    _instance = new PlayerFactory();
-                return _instance;
+                lock (_locker)
+                {
+                    if (_instance == null)
+                        _instance = new PlayerFactory();
+                    return _instance;
+                }
             }
         }
         public bool CreatePlayer(string username, string encyrpted_pwd)

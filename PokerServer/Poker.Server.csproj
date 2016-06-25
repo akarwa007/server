@@ -66,13 +66,9 @@
     <Compile Include="Card.cs" />
     <Compile Include="ClientConnections.cs" />
     <Compile Include="ClientPlayerManager.cs" />
+    <Compile Include="ClientView\CasinoView.cs" />
+    <Compile Include="ClientView\TableView.cs" />
     <Compile Include="Deck.cs" />
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="GameManager.cs" />
     <Compile Include="HandRankings.cs" />
@@ -85,9 +81,6 @@
     <Compile Include="Seat.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableManager.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -134,11 +127,16 @@
       <Project>{fc88d542-980c-44b7-93b4-db5e26afcb85}</Project>
       <Name>Poker.Shared</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Poker.Common\Poker.Common.csproj">
+      <Project>{b11a0eb2-c3a4-44f1-82f3-63164092fa83}</Project>
+      <Name>Poker.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Poker.Gateway\Poker.Gateway.csproj">
       <Project>{dace6c7c-25d2-4304-b58c-2850583ec598}</Project>
       <Name>Poker.Gateway</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

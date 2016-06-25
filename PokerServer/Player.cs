@@ -23,6 +23,20 @@ namespace Poker.Server
         {
 
         }
+        public string UserName
+        {
+            get
+            {
+                return _username;
+            }
+        }
+        public decimal ChipCount
+        {
+            get
+            {
+                return _chipcount;
+            }
+        }
         public string  serialize()
         {
             var string1 = "";
