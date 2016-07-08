@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Net.Sockets;
 using Poker.Shared;
 using Poker.Gateway;
 using Poker.Common;
@@ -20,12 +21,45 @@ namespace Poker.Server
         private bool _ServerStarted = false;
         TCPConnector conn = null;
         Dictionary<string,AsyncCallback> _listOfCallbacks = new Dictionary<string,AsyncCallback>();
-        
+        System.Timers.Timer _timer = new System.Timers.Timer(10);
         public Form1()
         {
+            
+            _timer.Elapsed += _timer_Elapsed;
+            
             TableManager.Instance.CreateTable(10);
             InitializeComponent();
+            this.textBox2.Text = "0";
+           // _timer.Start();
         }
+
+        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            update1();
+        }
+        private void cleanup_a_client(TcpClient client)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<TcpClient>(cleanup_a_client),new object[] { client});
+            }
+            else
+            {
+                this.conn.cleanup_client(client);
+            }
+        }
+        private void update1()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(update1));
+            }
+            else
+            {
+                this.textBox2.Text = (Convert.ToInt32(this.textBox2.Text) + 1).ToString();
+            }
+        }
+
         private bool ServerStarted
         {
             get
@@ -71,7 +105,7 @@ namespace Poker.Server
             // _listOfCallbacks.Add("createplayer",
             if (!this.ServerStarted)
             {// Start the Server
-                conn = new TCPConnector(new Action<String>(AppendTextBox), callback1);
+                conn = new TCPConnector(new Action<String>(AppendTextBox), new Action<TcpClient>(cleanup_a_client), callback1);
                 conn.start();
                 
                 this.ServerStarted = true;
@@ -127,6 +161,22 @@ namespace Poker.Server
             }
         }
 
-      
+        private void btnViewClients_Click(object sender, EventArgs e)
+        {
+            // list the poker clients connected to the server
+            // will have ability to disconnect a client too. 
+            dataGridView_Clients.Columns.Add("Name", "Name");
+            dataGridView_Clients.Columns.Add("First", "First");
+            dataGridView_Clients.Columns.Add("Last", "Last");
+            dataGridView_Clients.Rows.Add("one","two","three");
+            
+
+            
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }

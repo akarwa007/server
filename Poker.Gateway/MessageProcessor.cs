@@ -16,11 +16,13 @@ namespace Poker.Gateway
 
         public Message Process(StreamReader reader )
         {
-          
+            Poker.Shared.Message m = null;
             String line = reader.ReadLine();
-          
-            Poker.Shared.Message m = Poker.Shared.Message.DeSerialize(line);
-         
+            if (line != null)
+            {
+                m = Poker.Shared.Message.DeSerialize(line);
+            }
+
             return m;
 
         }

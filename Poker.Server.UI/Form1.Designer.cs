@@ -31,13 +31,24 @@
             this.btnStartServer1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btSendCasinoUpdate = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.btnViewClients = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.dataGridView_Clients = new System.Windows.Forms.DataGridView();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Clients)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnStartServer1
             // 
-            this.btnStartServer1.Location = new System.Drawing.Point(12, 12);
+            this.btnStartServer1.Location = new System.Drawing.Point(14, 12);
             this.btnStartServer1.Name = "btnStartServer1";
-            this.btnStartServer1.Size = new System.Drawing.Size(155, 82);
+            this.btnStartServer1.Size = new System.Drawing.Size(155, 47);
             this.btnStartServer1.TabIndex = 0;
             this.btnStartServer1.Text = "Start Server";
             this.btnStartServer1.UseVisualStyleBackColor = true;
@@ -45,33 +56,106 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(189, 12);
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox1.Location = new System.Drawing.Point(3, 3);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(451, 271);
+            this.textBox1.Size = new System.Drawing.Size(225, 141);
             this.textBox1.TabIndex = 1;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // btSendCasinoUpdate
             // 
-            this.btSendCasinoUpdate.Location = new System.Drawing.Point(12, 135);
+            this.btSendCasinoUpdate.Location = new System.Drawing.Point(17, 152);
             this.btSendCasinoUpdate.Name = "btSendCasinoUpdate";
-            this.btSendCasinoUpdate.Size = new System.Drawing.Size(155, 39);
+            this.btSendCasinoUpdate.Size = new System.Drawing.Size(152, 39);
             this.btSendCasinoUpdate.TabIndex = 2;
             this.btSendCasinoUpdate.Text = "Send Casino Update";
             this.btSendCasinoUpdate.UseVisualStyleBackColor = true;
             this.btSendCasinoUpdate.Click += new System.EventHandler(this.btSendCasinoUpdate_Click);
             // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(17, 230);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(152, 20);
+            this.textBox2.TabIndex = 3;
+            // 
+            // btnViewClients
+            // 
+            this.btnViewClients.Location = new System.Drawing.Point(14, 86);
+            this.btnViewClients.Name = "btnViewClients";
+            this.btnViewClients.Size = new System.Drawing.Size(155, 39);
+            this.btnViewClients.TabIndex = 4;
+            this.btnViewClients.Text = "View Clients";
+            this.btnViewClients.UseVisualStyleBackColor = true;
+            this.btnViewClients.Click += new System.EventHandler(this.btnViewClients_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.dataGridView_Clients, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.textBox1, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(462, 295);
+            this.tableLayoutPanel1.TabIndex = 5;
+            // 
+            // dataGridView_Clients
+            // 
+            this.dataGridView_Clients.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_Clients.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_Clients.Location = new System.Drawing.Point(234, 3);
+            this.dataGridView_Clients.Name = "dataGridView_Clients";
+            this.dataGridView_Clients.Size = new System.Drawing.Size(225, 141);
+            this.dataGridView_Clients.TabIndex = 2;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.AllowDrop = true;
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.AllowDrop = true;
+            this.splitContainer1.Panel1.Controls.Add(this.btSendCasinoUpdate);
+            this.splitContainer1.Panel1.Controls.Add(this.textBox2);
+            this.splitContainer1.Panel1.Controls.Add(this.btnStartServer1);
+            this.splitContainer1.Panel1.Controls.Add(this.btnViewClients);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.AllowDrop = true;
+            this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel1);
+            this.splitContainer1.Size = new System.Drawing.Size(652, 295);
+            this.splitContainer1.SplitterDistance = 186;
+            this.splitContainer1.TabIndex = 6;
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(652, 295);
-            this.Controls.Add(this.btSendCasinoUpdate);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.btnStartServer1);
+            this.Controls.Add(this.splitContainer1);
             this.Name = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load_1);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Clients)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -81,6 +165,11 @@
         private System.Windows.Forms.Button btnStartServer1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btSendCasinoUpdate;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button btnViewClients;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.DataGridView dataGridView_Clients;
+        private System.Windows.Forms.SplitContainer splitContainer1;
     }
 }
 

@@ -29,10 +29,12 @@ namespace Poker.Gateway
         private MessageProcessor _MP = new MessageProcessor();
         
         private Action<String> _funcStream;
+        private Action<TcpClient> _func1;
         private createplayer_callback _callback_createplayer;
-        public TCPConnector(Action<String> func, createplayer_callback callback1)
+        public TCPConnector(Action<String> func, Action<TcpClient> func1 ,  createplayer_callback callback1)
         {
             _funcStream = func;
+            _func1 = func1;
             _callback_createplayer = callback1;
         }
         public void start()
@@ -47,6 +49,17 @@ namespace Poker.Gateway
             TcpClient client = new TcpClient("localhost", 8113);
 
         }
+        public void cleanup_client(TcpClient client)
+        {
+            
+            _clients_readers[client].Abort();
+            _clients_readers.Remove(client);
+            _clients_writers[client].Abort();
+            _clients_writers.Remove(client);
+            _writer_queue.Remove(client);
+            _reader_queue.Remove(client);
+        }
+      
         private void startasync()
         {
             System.Net.IPAddress ipAddress = System.Net.IPAddress.Parse("127.0.0.1");
@@ -56,6 +69,7 @@ namespace Poker.Gateway
             while (listen)
             {
                 TcpClient client = listener.AcceptTcpClient();
+                
                 forknewthread(client);
                 Console.WriteLine("client connected");
             }
@@ -81,7 +95,6 @@ namespace Poker.Gateway
         }
         private void func_reader(TcpClient client)
         {
-            bool IsAuthenticated = false;
             NetworkStream ns = client.GetStream();
             StreamReader reader = new StreamReader(ns);
             MemoryStream ms = new MemoryStream();
@@ -107,6 +120,14 @@ namespace Poker.Gateway
                     while ((_message = _MP.Process(reader)) != null)
                     {
                        // Console.WriteLine(line);
+                       if (_message == null)
+                        {
+                            // client has disconnected.
+                            client.Close();
+                           // cleanup_client(client);
+                            _func1(client);
+                            break;
+                        }
                         lock (_queue)
                         {
                             _queue.Enqueue(_message);
@@ -185,8 +206,19 @@ namespace Poker.Gateway
                     while (_queue.Count > 0)
                     {
                         Message message = _queue.Dequeue();
-                        sw.WriteLine(message.Serialize());
-                        sw.Flush();
+                        try
+                        {
+                            sw.WriteLine(message.Serialize());
+                            sw.Flush();
+                        }
+                        catch (System.IO.IOException e)
+                        {
+                            // this means socket is closed. 
+                            // cleanup_client(client);
+                            _func1(client);
+                            client.Close();
+                        }
+                        
                     }
                 }
             }
