@@ -178,5 +178,10 @@ namespace Poker.Server
         {
             Environment.Exit(0);
         }
+
+        private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

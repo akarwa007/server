@@ -7,10 +7,10 @@ using Poker.Gateway;
 
 namespace Poker.Server
 {
-    public  class PlayerConnection
+    public  class PokerUserConnection
     {
        TCPConnector _tcpConnector;
-       public PlayerConnection()
+       public PokerUserConnection()
        {
            //_tcpConnector = new TCPConnector(null);
        }

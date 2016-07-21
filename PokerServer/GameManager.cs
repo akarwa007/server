@@ -53,7 +53,7 @@ namespace Poker.Server
             }
 
             // deal the flop 
-           Tuple<Card,Card,Card> flop =  _game.DealFlop();
+           Tuple<Card,Card,Card> flop =  _game.GetFlop();
            _CPM.SendFlop(_table, flop);
 
             // do bet collecting round
@@ -71,7 +71,7 @@ namespace Poker.Server
                playercount--;
            }
             //deal the turn 
-           Card turn = _game.DealTurn();
+           Card turn = _game.GetTurn();
            _CPM.SendTurn(_table, turn);
 
             // do bet collecting round
@@ -90,8 +90,8 @@ namespace Poker.Server
            }
 
             // deal the river
-           Card river = _game.DealTurn();
-           _CPM.SendTurn(_table, river);
+           Card river = _game.GetRiver();
+           _CPM.SendRiver(_table, river);
 
            // do the bet collecting round
 
