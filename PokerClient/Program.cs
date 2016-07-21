@@ -14,11 +14,18 @@ namespace PokerClient
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            // Application.Run(new PokerClientForm());
-            //Application.Run(new Form1());
-            Application.Run(new TestForm());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+               
+                Application.Run(new TestForm());
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        
         }
     }
 }

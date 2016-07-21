@@ -23,10 +23,13 @@ namespace PokerClient
     public partial class TestPlayer : UserControl
     {
         bool _Connected = false;
+        TcpClient _client = null;
+
         Poker.Shared.Message _message;
         Queue<Poker.Shared.Message> _queue_outgoing = new Queue<Poker.Shared.Message>();
         Queue<Poker.Shared.Message> _queue_incoming = new Queue<Poker.Shared.Message>();
         List<Poker.Shared.Message> _queue_pending = new List<Poker.Shared.Message>();
+        List<Thread> _threads = new List<Thread>();
 
         ShellForm _shellform;
         ViewModel_Casino _casinoModel;
@@ -42,6 +45,10 @@ namespace PokerClient
             _casinoModel = new ViewModel_Casino();
             _casinoView = new View_Casino();
             _casinoView.UpdateModel(_casinoModel);
+            _shellform.Dock = DockStyle.Fill;
+            _shellform.AutoSize = false;
+            _casinoView.Dock = DockStyle.Fill;
+            _casinoView.AutoSize = false;
             _shellform.Controls.Add(_casinoView);
         }
 
@@ -62,12 +69,27 @@ namespace PokerClient
         }
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            TcpClient client = new TcpClient("localhost", 8113);
-
-            if (client.Connected)
+            if ((_client == null) || (_client.Connected == false))
             {
-                this.Connected = true;
-                forknewthread(client);
+                _client = new TcpClient("localhost", 8113);
+
+                if (_client.Connected)
+                {
+                    this.Connected = true;
+                    forknewthread(_client);
+                }
+            }
+            else // you want to disconnect
+            {
+                _client.Close();
+                if (_client.Connected == false)
+                {
+                    this.Connected = false;
+                    foreach(Thread t in _threads)
+                    {
+                        t.Abort();
+                    }
+                }
             }
             
         }
@@ -76,11 +98,13 @@ namespace PokerClient
             Thread readerthread = new Thread(
                () => func_reader(this.txtReceiever, client));
 
+            _threads.Add(readerthread);
             readerthread.Start();
 
             Thread writerthread = new Thread(
               () => func_writer(client));
 
+            _threads.Add(writerthread);
             writerthread.Start();
         }
         private Poker.Shared.Message GetMatch(Poker.Shared.Message message)

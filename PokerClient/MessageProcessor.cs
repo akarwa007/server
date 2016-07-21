@@ -17,10 +17,16 @@ namespace PokerClient
 
         public static Message Process(StreamReader reader )
         {
-          
-            String line = reader.ReadLine();
-            Poker.Shared.Message m = Poker.Shared.Message.DeSerialize(line);
-        
+            Poker.Shared.Message m = null;
+            try
+            {
+                String line = reader.ReadLine();
+                m = Poker.Shared.Message.DeSerialize(line);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             return m;
 
         }

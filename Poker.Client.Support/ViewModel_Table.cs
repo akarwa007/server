@@ -17,7 +17,7 @@ namespace Poker.Client.Support
         {
           
         }
-        public List<Tuple<short, string, decimal>> TableDetails
+        public List<Tuple<short, string, decimal>> TableDetails // seatno , playername , chipcount
         {
             get;
             set;

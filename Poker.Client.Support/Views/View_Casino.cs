@@ -20,25 +20,23 @@ namespace Poker.Client.Support.Views
         public void UpdateModel(ViewModel_Casino model)
         {
             _casinoModel = model;
-            //refresh the ui 
-           // this.treeView1.Nodes.Clear();
+         
             ClearTreeView();
-           // model.ListOfTables.Select(x => new(x.GameName,x.GameValue,x.TableNo));
-           var results = from p in model.ListOfTables
-                          group p.GameValue by p.GameName into g
-                         select new { gamename = g.Key, gamevalues = g.ToList() };
-
-            foreach(var x in results)
+          
+          
+            var groups = model.ListOfTables.GroupBy(x => x.GameName, x => new { x.GameValue , x});
+            foreach (var j in groups)
             {
-                TreeNode node = new TreeNode(x.gamename);
-                foreach(var c in x.gamevalues)
+                TreeNode node = new TreeNode(j.Key.ToString());
+                foreach (var k in j.ToList())
                 {
-                    node.Nodes.Add(c);
+                    TreeNode t = new TreeNode(k.GameValue);
+                    t.Tag = k.x;
+                    node.Nodes.Add(t);
                 }
-               // this.treeView1.Nodes.Add(node);
                 AddTreeNodes(node);
             }
-           
+       
         }
         private void ClearTreeView()
         {
@@ -50,6 +48,7 @@ namespace Poker.Client.Support.Views
         }
         private void AddTreeNodes(TreeNode node)
         {
+
             if (this.InvokeRequired)
             {
                 this.Invoke(new Action<TreeNode>(AddTreeNodes), new object[] { node });
@@ -61,12 +60,40 @@ namespace Poker.Client.Support.Views
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-
+            ViewModel_Table vm = (ViewModel_Table)e.Node.Tag;
+            View_Table vt = new View_Table(vm);
+            vt.SuspendLayout();
+            vt.Height = splitContainer1.Panel2.Height;
+            vt.Width = splitContainer1.Panel2.Width;
+            splitContainer1.Panel2.Controls.Clear();
+            splitContainer1.Panel2.Controls.Add(vt);
+            vt.PerformLayout();
+            
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void splitContainer1_Panel2_SizeChanged(object sender, EventArgs e)
+        {
+            Panel p = (Panel)sender;
+            if (p.Controls.Count > 0)
+            {
+                if (p.Controls[0] is Views.View_Table)
+                {
+                    View_Table vt = (View_Table)p.Controls[0];
+                    vt.Height = p.Height;
+                    vt.Width = p.Width;
+                }
+            }
+        }
+
+        private void splitContainer1_Panel2_DoubleClick(object sender, EventArgs e)
+        {
+           
+            
         }
     }
 }

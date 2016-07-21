@@ -23,7 +23,7 @@ namespace Poker.Client.Support.Views
         {
             View_Card v_card = new View_Card();
             v_card.Dock = DockStyle.Fill;
-            v_card.AutoSize = false;
+            v_card.AutoSize = false;    
             this.Controls.Add(v_card);
         }
     }
