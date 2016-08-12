@@ -36,6 +36,10 @@ namespace Poker.Shared
                 _content = value;
             }
         }
+        public String UserName
+        {
+            get;set;
+        }
         [JsonProperty("MessageDirection", Required = Required.Always)]
         public MessageDirection MessageDirection
         {
@@ -110,10 +114,14 @@ namespace Poker.Shared
     {
         PlayerJoiningGame,
         PlayerLeavingGame,
+        PlayerJoiningTable,
+        PlayerLeavingTable,
+        PlayerAddingChips,
         PlayerSigningIn,
         PlayerSigningOut,
         PlayerAction,
-        CasinoUpdate
+        CasinoUpdate,
+        GeneralPurpose
     }
   
     [JsonConverter(typeof(StringEnumConverter))]
@@ -122,6 +130,8 @@ namespace Poker.Shared
         Incoming,
         Outgoing
     }
+
+    public delegate void JoinedTableHandler(string TableNo, short SeatNo, decimal ChipCounts);
 
 
 }

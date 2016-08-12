@@ -7,7 +7,7 @@ using Poker.Shared;
 
 namespace Poker.Client.Support
 {
-    public class ViewModel_Player
+    public class ViewModel_Player : BaseViewModel
     {
         private Tuple<A_Card, A_Card> _holecards = null;
         public ViewModel_Player()

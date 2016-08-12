@@ -7,17 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Poker.Shared;
 
 namespace Poker.Client.Support.Views
 {
     public partial class View_Table : UserControl
     {
         ViewModel_Table _vm_table = null;
+        public event JoinedTableHandler JoinedTableEvent;
         public View_Table(ViewModel_Table vm_table)
         {
             _vm_table = vm_table;
 
             InitializeComponent();
+        }
+        public string UserName
+        {
+            get; set;
         }
         private void RenderControls()
         {
@@ -37,11 +43,6 @@ namespace Poker.Client.Support.Views
                 l2.Location = new Point(l1.Location.X, l1.Location.Y + 22);
                 l3.Location = new Point(l2.Location.X, l2.Location.Y + 22);
 
-               // l1.Size = new Size(30, 20);
-                //l2.Size = new Size(30, 20);
-
-               // l3.Size = new Size(30, 20);
-
                 l1.AutoSize = true;
                 l2.AutoSize = true;
                 l3.AutoSize = true;
@@ -50,9 +51,12 @@ namespace Poker.Client.Support.Views
                 this.Controls.Add(l2);
                 this.Controls.Add(l3);
             }
-           
+
+            short seatno = 1;
             View_Seat seat1 = null;
-            ViewModel_Seat vm_seat = new ViewModel_Seat();
+            
+            
+            ViewModel_Seat vm_seat = _vm_table.get_VM_Seat(seatno);
             int count = 10;
             int x, y;
 
@@ -68,12 +72,14 @@ namespace Poker.Client.Support.Views
             {
                 x = x + seatwidth * 2;
                 //y = y + 10;
-                vm_seat = new ViewModel_Seat();
+                vm_seat = _vm_table.get_VM_Seat(seatno);
                 seat1 = new View_Seat(vm_seat);
+                seat1.JoinedTableEvent += Seat_JoinedTableEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
                 count--;
+                seatno++;
             }
             x = seatwidth;
             y = y1 - seatheight*2;
@@ -81,12 +87,15 @@ namespace Poker.Client.Support.Views
             {
                 x = x + seatwidth * 2;
                 //y = y + 10;
-                vm_seat = new ViewModel_Seat();
+
+                vm_seat = _vm_table.get_VM_Seat(seatno);
                 seat1 = new View_Seat(vm_seat);
+                seat1.JoinedTableEvent += Seat_JoinedTableEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
                 count--;
+                seatno++;
             }
             x = 0;
             y = y1 / 2 - seatheight/2;
@@ -94,19 +103,35 @@ namespace Poker.Client.Support.Views
             {
                 x = x + x1 / 12;
                 //y = y + 10;
-                vm_seat = new ViewModel_Seat();
+                vm_seat = _vm_table.get_VM_Seat(seatno);
                 seat1 = new View_Seat(vm_seat);
+                seat1.JoinedTableEvent += Seat_JoinedTableEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
                 count--;
+                seatno++;
             }
             seat1.Location = new Point(x1 - x1 / 10, seat1.Location.Y);
         }
+
+        private void Seat_JoinedTableEvent(string TableNo, short SeatNo, decimal ChipCounts)
+        {
+            if (JoinedTableEvent != null)
+                JoinedTableEvent.Invoke(TableNo, SeatNo, ChipCounts);
+        }
+
+
         private void View_Table_Load(object sender, EventArgs e)
         {
-
-            RenderControls();
+            try
+            {
+                RenderControls();
+            }
+            catch(Exception e1)
+            {
+                Console.WriteLine(e1.Message);
+            }
         }
 
         private void View_Table_SizeChanged(object sender, EventArgs e)
@@ -117,30 +142,6 @@ namespace Poker.Client.Support.Views
 
         }
 
-        private void View_Table_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                Console.WriteLine("Paint called");
-               
-                this.Controls.Clear();
-                RenderControls();
-                Graphics g = e.Graphics;
-                Pen p = new Pen(Brushes.Black);
-                Point center = new Point(this.Width / 2, this.Height / 2);
-                foreach (Control c in this.Controls)
-                {
-                    if (c.GetType() == typeof(View_Seat))
-                    {
-                        Point p1 = new Point(c.Left + c.Width / 2, c.Top + c.Height / 2);
-                        g.DrawLine(p, center, p1);
-                    }
-                }
-            }
-            catch (Exception e1)
-            {
-                Console.WriteLine(e1.Message);
-            }
-        }
+     
     }
 }

@@ -15,6 +15,7 @@ namespace PokerClient
         public ShellForm()
         {
             InitializeComponent();
+            this.ClientSize = new System.Drawing.Size(1000, 600);
         }
 
         private void ShellForm_Load(object sender, EventArgs e)

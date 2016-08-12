@@ -30,6 +30,19 @@ namespace PokerClient
             return m;
 
         }
+        public static void SendMessagePlayerSigned()
+        {
+
+        }
+        public static void SendMessageJoinedTable(string tableno, short seatno)
+        {
+
+        }
+        public static void SendMessageLeftTable(string tableno, short seatno)
+        {
+
+        }
+
     }
 
 }

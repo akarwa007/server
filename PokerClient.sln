@@ -1,9 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poker.Client", "PokerClient\Poker.Client.csproj", "{C9FE3198-0159-47C9-8825-6478CB387E70}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC88D542-980C-44B7-93B4-DB5E26AFCB85} = {FC88D542-980C-44B7-93B4-DB5E26AFCB85}
+		{7A007CAA-213B-4731-94B8-EAE120804C41} = {7A007CAA-213B-4731-94B8-EAE120804C41}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poker.Client.Support", "Poker.Client.Support\Poker.Client.Support.csproj", "{7A007CAA-213B-4731-94B8-EAE120804C41}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC88D542-980C-44B7-93B4-DB5E26AFCB85} = {FC88D542-980C-44B7-93B4-DB5E26AFCB85}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poker.Shared", "Poker.Shared\Poker.Shared.csproj", "{FC88D542-980C-44B7-93B4-DB5E26AFCB85}"
 EndProject

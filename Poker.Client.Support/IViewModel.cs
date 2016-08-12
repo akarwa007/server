@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Poker.Client.Support
 {
-    public class ViewModel_Card : BaseViewModel
+    public interface IViewModel
     {
-        public ViewModel_Card()
-        {
-        }
+        string UserName { get; set; }
     }
 }

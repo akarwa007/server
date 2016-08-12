@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.btnAddPlayer = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -37,19 +38,22 @@
             // 
             // btnAddPlayer
             // 
-            this.btnAddPlayer.Location = new System.Drawing.Point(24, 12);
+            this.btnAddPlayer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.btnAddPlayer.Image = ((System.Drawing.Image)(resources.GetObject("btnAddPlayer.Image")));
+            this.btnAddPlayer.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddPlayer.Location = new System.Drawing.Point(24, 3);
             this.btnAddPlayer.Name = "btnAddPlayer";
-            this.btnAddPlayer.Size = new System.Drawing.Size(75, 23);
+            this.btnAddPlayer.Size = new System.Drawing.Size(183, 45);
             this.btnAddPlayer.TabIndex = 0;
             this.btnAddPlayer.Text = "Add Player";
-            this.btnAddPlayer.UseVisualStyleBackColor = true;
+            this.btnAddPlayer.UseVisualStyleBackColor = false;
             this.btnAddPlayer.Click += new System.EventHandler(this.btnAddPlayer_Click);
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(24, 41);
+            this.tabControl1.Location = new System.Drawing.Point(24, 54);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(702, 318);
@@ -80,11 +84,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(753, 380);
+            this.ClientSize = new System.Drawing.Size(757, 399);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnAddPlayer);
             this.Name = "TestForm";
-            this.Text = "TestForm";
+            this.Text = "Add Poker User";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TestForm_FormClosing);
             this.Load += new System.EventHandler(this.TestForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -7,15 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Poker.Shared;
+using Newtonsoft.Json;
+using Poker.Shared;
 
 namespace Poker.Client.Support.Views
 {
     public partial class View_Casino : UserControl
     {
         ViewModel_Casino _casinoModel;
+        public event JoinedTableHandler JoinedTableEvent;
         public View_Casino()
         {
             InitializeComponent();
+        }
+       public string UserName
+        {
+            get;set;
         }
         public void UpdateModel(ViewModel_Casino model)
         {
@@ -57,11 +65,22 @@ namespace Poker.Client.Support.Views
             this.treeView1.Nodes.Add(node);
            
         }
+        public void CallBack(Poker.Shared.Message message)
+        {
+            if (message.MessageType == MessageType.CasinoUpdate)
+            {
+                ViewModel_Casino vm = JsonConvert.DeserializeObject<ViewModel_Casino>(message.Content);
+                
+                this.UpdateModel(vm);
+            }
+        }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             ViewModel_Table vm = (ViewModel_Table)e.Node.Tag;
+            vm.UserName = this.UserName;
             View_Table vt = new View_Table(vm);
+            vt.JoinedTableEvent += Vt_JoinedTableEvent;
             vt.SuspendLayout();
             vt.Height = splitContainer1.Panel2.Height;
             vt.Width = splitContainer1.Panel2.Width;
@@ -71,9 +90,10 @@ namespace Poker.Client.Support.Views
             
         }
 
-        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
+        private void Vt_JoinedTableEvent(string TableNo, short SeatNo, decimal ChipCounts)
         {
-
+            if (JoinedTableEvent != null)
+                JoinedTableEvent.Invoke(TableNo, SeatNo, ChipCounts);
         }
 
         private void splitContainer1_Panel2_SizeChanged(object sender, EventArgs e)
@@ -94,6 +114,11 @@ namespace Poker.Client.Support.Views
         {
            
             
+        }
+
+        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

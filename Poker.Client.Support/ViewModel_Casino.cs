@@ -9,14 +9,19 @@ using Newtonsoft.Json;
 
 namespace Poker.Client.Support
 {
-    public class ViewModel_Casino
+    public class ViewModel_Casino  : BaseViewModel
     {
         private List<ViewModel_Table> _list = new List<ViewModel_Table>();
       
+        public ViewModel_Casino(string UserName)
+        {
+            base.UserName = UserName;
+        }
         public ViewModel_Casino()
         {
+         
         }
-     
+
         public List<ViewModel_Table> ListOfTables
         {
             get
@@ -24,5 +29,7 @@ namespace Poker.Client.Support
                 return _list;
             }
         }
+
+     
     }
 }

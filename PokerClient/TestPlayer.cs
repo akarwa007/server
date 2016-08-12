@@ -23,8 +23,10 @@ namespace PokerClient
     public partial class TestPlayer : UserControl
     {
         bool _Connected = false;
+        bool _Authenticated = false;
         TcpClient _client = null;
 
+        Poker.Shared.Message _firstMessage;
         Poker.Shared.Message _message;
         Queue<Poker.Shared.Message> _queue_outgoing = new Queue<Poker.Shared.Message>();
         Queue<Poker.Shared.Message> _queue_incoming = new Queue<Poker.Shared.Message>();
@@ -34,22 +36,37 @@ namespace PokerClient
         ShellForm _shellform;
         ViewModel_Casino _casinoModel;
         View_Casino _casinoView;
+        PokerUserC _pokeruser;
+
+        PokerClientContext _context;
         public TestPlayer()
         {
-            init();
+            //init();
             InitializeComponent();
         }
-        private void init()
+        private void init(string username, string password)
         {
+            _context = new PokerClientContext();
+          
+
             _shellform = new ShellForm();
-            _casinoModel = new ViewModel_Casino();
+            _casinoModel = new ViewModel_Casino(username);
+            
             _casinoView = new View_Casino();
+            _casinoView.UserName = username;
             _casinoView.UpdateModel(_casinoModel);
             _shellform.Dock = DockStyle.Fill;
             _shellform.AutoSize = false;
             _casinoView.Dock = DockStyle.Fill;
             _casinoView.AutoSize = false;
             _shellform.Controls.Add(_casinoView);
+
+            _pokeruser = new PokerUserC(_client, null, username, password);
+            _context.PokerUser = _pokeruser;
+            _context.MessageFactory = new MessageFactory(_pokeruser);
+            _context.MessageFactory.RegisterCallback(_casinoView.CallBack, MessageType.CasinoUpdate);
+            _pokeruser.setContext(_context);
+            _casinoView.JoinedTableEvent += _context.MessageFactory.SendTableJoinMessage;
         }
 
         private bool Connected
@@ -76,7 +93,12 @@ namespace PokerClient
                 if (_client.Connected)
                 {
                     this.Connected = true;
-                    forknewthread(_client);
+                    string content = txtUsername.Text + ":" + txtPassword.Text;
+                    _firstMessage = new Poker.Shared.Message(content, MessageType.PlayerSigningIn);
+                    _queue_outgoing.Enqueue(_firstMessage);
+                    init(txtUsername.Text, txtUsername.Text);
+
+                   // forknewthread(_client);
                 }
             }
             else // you want to disconnect
