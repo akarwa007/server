@@ -22,8 +22,25 @@ namespace Poker.Server
         }
         public void CreateTable(short capacity)
         {
-            _tables.Add(new Table(10,"TexasHodldem","NoLimit","2-5",200,500));
-            _tables.Add(new Table(10, "TexasHodldem", "NoLimit", "2-5", 200, 500));
+            Table t = new Table(10, "TexasHodldem", "NoLimit", "2-5", 200, 500);
+            
+            Player p1 = new Player("Alok");
+            Player p2 = new Player("Alka");
+            Player p3 = new Player("Anshu");
+            Player p4 = new Player("Anand");
+            Player p5 = new Player("Anurag");
+            Player p6 = new Player("Tans");
+            Player p7 = new Player("Veer");
+            t.AddPlayer(p1);
+            t.AddPlayer(p2);
+            t.AddPlayer(p3);
+            t.AddPlayer(p4);
+            t.AddPlayer(p5);
+            t.AddPlayer(p6);
+            t.AddPlayer(p7);
+
+            _tables.Add(t);
+            //_tables.Add(new Table(10, "TexasHodldem", "NoLimit", "2-5", 200, 500));
             _tables.Add(new Table(10, "TexasHodldem", "Limit", "1-2", 200, 500));
             _tables.Add(new Table(10, "TexasHodldem", "Limit", "3-6", 200, 500));
             _tables.Add(new Table(10, "TexasHodldem", "Limit", "4-8", 200, 500));

@@ -26,6 +26,18 @@ namespace Poker.Server
         {
             get { return _seatno; }
         }
+        public string TableNo
+        {
+            get { return _table.TableNo; }
+        }
+        public decimal ChipCounts
+        {
+            get { return _player.ChipCount; }
+        }
+        public string UserName
+        {
+            get { return _player.UserName; }
+        }
         public bool RemovePlayer(Player p)
         {
             if (_player == p)
@@ -46,7 +58,7 @@ namespace Poker.Server
         }
         public bool IsEmpty()
         {
-            return (_player == null);
+            return (_player.UserName == "Empty");
         }
     
     }

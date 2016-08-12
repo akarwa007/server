@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net.Sockets;
 using Poker.Shared;
+using Poker.Common;
 
 
 namespace Poker.Server
@@ -23,8 +24,14 @@ namespace Poker.Server
         
         TcpClient _client;
         PokerUser _pokerUser;
-        Thread IncomingThread;
-        Thread OutgoingThread;
+        Thread ProduceIncomingThread;
+        Thread ConsumeIncomingThread;
+        Thread ProduceOutgoingThread;
+        Thread ConsumeOutgoingThread;
+
+        public RecieveMessageDelegate ReceieveMessageHandler = null; // probably needs a property
+        
+        
 
         private Action<String> _funcStream;
         public ProducerConsumer(TcpClient client, PokerUser user)
@@ -36,20 +43,61 @@ namespace Poker.Server
         private void init()
         {
            
-             IncomingThread = new Thread(
-               () => func_incoming(_client));
+            ProduceIncomingThread = new Thread(
+               () => func_produceincoming(_client));
 
-            IncomingThread.Name = "IncomingThread";
-            IncomingThread.Start();
+            ProduceIncomingThread.Name = "ProduceIncomingThread";
+            ProduceIncomingThread.Start();
 
-             OutgoingThread = new Thread(
-              () => func_outgoing(_client));
-            
-            OutgoingThread.Name = "OutgoingThread";
-            OutgoingThread.Start();
+            ConsumeIncomingThread = new Thread(
+            () => func_consumeincoming(_client));
+
+            ConsumeIncomingThread.Name = "ConsumeIncomingThread";
+            ConsumeIncomingThread.Start();
+
+            ConsumeOutgoingThread = new Thread(
+              () => func_consumeoutgoing(_client));
+
+            ConsumeOutgoingThread.Name = "ConsumeOutgoingThread";
+            ConsumeOutgoingThread.Start();
         }
-        private void func_incoming(TcpClient client)
+        private void func_consumeoutgoing(TcpClient client)
         {
+            //essentially dequeue message from queueOutgoing and write to the networkstream
+            NetworkStream ns = client.GetStream();
+            StreamWriter sw = new StreamWriter(ns);
+           
+            while (client.Connected)
+            {
+                lock (lockOutgoing)
+                {
+                    while (queueOutgoing.Count == 0)
+                    {
+                        Monitor.Wait(lockOutgoing);
+                    }
+                    while (queueOutgoing.Count > 0)
+                    {
+                        Message message = queueOutgoing.Dequeue();
+                        try
+                        {
+                            sw.WriteLine(message.Serialize());
+                            sw.Flush();
+                        }
+                        catch (System.IO.IOException e)
+                        {
+                            // this means socket is closed. 
+                            // cleanup_client(client);
+                            //_func1(client);
+                            client.Close();
+                        }
+
+                    }
+                }
+            }
+        }
+        private void func_produceincoming(TcpClient client)
+        {
+            // essentially read the message from networkstream and produce into the queueIncoming
             NetworkStream ns = client.GetStream();
             StreamReader reader = new StreamReader(ns);
            
@@ -81,29 +129,21 @@ namespace Poker.Server
             }
 
         }
-        private void func_outgoing(TcpClient client)
+        private void func_consumeincoming(TcpClient client)
         {
-            NetworkStream ns = client.GetStream();
-            StreamWriter sw = new StreamWriter(ns);
-      
-            while (client.Connected)
+            //essentially dequeue from the queueIncoming
+           while(client.Connected)
             {
-                        Message m = ConsumeOutgoing();
-                        try
-                        {
-                            sw.WriteLine(m.Serialize());
-                            sw.Flush();
-                        }
-                        catch (System.IO.IOException e)
-                        {
-                            // this means socket is closed. 
-                            // cleanup_client(client);
-                          
-                            client.Close();
-                        }
+                Message m = ConsumeIncoming();
+                m.UserName = this._pokerUser.UserName;
+                // fire all callbacks waiting on these messages.
+                if (ReceieveMessageHandler != null)
+                {
+                    ReceieveMessageHandler.Invoke(m); ;
+                }
             }
-
         }
+    
         public void ProduceIncoming(Message o)
         {
             lock (lockIncoming)
@@ -115,7 +155,7 @@ namespace Poker.Server
                 // in quick succession, we may only pulse once, waking
                 // a single thread up, even if there are multiple threads
                 // waiting for items.            
-                Monitor.Pulse(lockIncoming);
+                Monitor.PulseAll(lockIncoming);
             }
         }
         public void ProduceOutgoing(Message o)
@@ -129,7 +169,7 @@ namespace Poker.Server
                 // in quick succession, we may only pulse once, waking
                 // a single thread up, even if there are multiple threads
                 // waiting for items.            
-                Monitor.Pulse(lockOutgoing);
+                Monitor.PulseAll(lockOutgoing);
             }
         }
 

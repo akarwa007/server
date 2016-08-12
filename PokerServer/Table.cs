@@ -13,6 +13,7 @@ namespace Poker.Server
 
         private short _capacity = 9;
         private Dictionary<Seat, Player> _seats;
+        private Seat[] _Seats;
         private int _dealerPosition;
         private string _gameName; // e.g Texas Holdem
         private string _gameSubName; // e.g No Limit
@@ -32,6 +33,7 @@ namespace Poker.Server
             if ((capacity < 2) || (capacity > 10))
                 throw new Exception("Capacity cannot be less than 2 or greater than 10");
             _capacity = capacity;
+            _Seats = new Seat[capacity+1];
             initialize();
             Console.WriteLine("default table cons with capacity of " + this._capacity);
         }
@@ -44,8 +46,11 @@ namespace Poker.Server
             Player empty = new Player("Empty");
             while (count > 0)
             {
-                _seats.Add(new Seat(empty, this, seatno++), empty);
+                Seat s = new Seat(empty, this, seatno);
+                _seats.Add(s, empty);
+                _Seats[seatno] = s;
                 count--;
+                seatno++;
             }
 
         }
@@ -63,7 +68,16 @@ namespace Poker.Server
                     break;
                 }
             }
-           
+        }
+        public bool AddPlayer(Player p, short SeatNo)
+        {
+            bool success = false;
+            if (_Seats[SeatNo].IsEmpty())
+            {
+                _Seats[SeatNo].SeatPlayer(p);
+                success = true;
+            }
+            return success;
         }
 
         public void RemovePlayer(Player p)
@@ -84,6 +98,10 @@ namespace Poker.Server
             get
             {
                 return _seats;
+            }
+            set
+            {
+                _seats = value;
             }
         }
         public int DealerPosition

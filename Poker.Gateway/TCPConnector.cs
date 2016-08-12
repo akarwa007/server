@@ -28,14 +28,14 @@ namespace Poker.Gateway
 
         private MessageProcessor _MP = new MessageProcessor();
         
-        private Action<String> _funcStream;
+        private Action<Message> _funcStream;
         private Action<TcpClient> _func1;
-        private createplayer_callback _callback_createplayer;
-        public TCPConnector(Action<String> func, Action<TcpClient> func1 ,  createplayer_callback callback1)
+        private createpokeruser_callback _callback_createpokeruser;
+        public TCPConnector(Action<Message> func, Action<TcpClient> func1 ,  createpokeruser_callback callback1)
         {
             _funcStream = func;
             _func1 = func1;
-            _callback_createplayer = callback1;
+            _callback_createpokeruser = callback1;
         }
         public void start()
         {
@@ -65,7 +65,7 @@ namespace Poker.Gateway
             System.Net.IPAddress ipAddress = System.Net.IPAddress.Parse("127.0.0.1");
             listener = new TcpListener(ipAddress,8113);
             listener.Start(100);
-            _funcStream("Server Started Successfully");
+            _funcStream(new Message("Server Started Successfully",MessageType.GeneralPurpose));
             while (listen)
             {
                 TcpClient client = listener.AcceptTcpClient();
@@ -75,12 +75,13 @@ namespace Poker.Gateway
             }
             if (listener != null)
                 listener.Stop();
-            _funcStream("Stopping the listening");
+            _funcStream(new Message("Stopping the listening",MessageType.GeneralPurpose));
             Console.WriteLine("Stopping the listening");
         }
         private void forknewthread(TcpClient client)
         {
-            _funcStream("Incoming new client request");
+            _funcStream(new Message("Incoming new client request", MessageType.GeneralPurpose));
+            /*
             Thread readerthread = new Thread(
                () => func_reader(client));
             _clients_readers.Add(client,readerthread);
@@ -92,6 +93,9 @@ namespace Poker.Gateway
             _clients_writers.Add(client, writerthread);
             writerthread.Name = "WriterThread";
             writerthread.Start();
+            */
+            //create a pokeruser 
+            _callback_createpokeruser(client,_funcStream, "", "");
         }
         private void func_reader(TcpClient client)
         {
@@ -134,14 +138,14 @@ namespace Poker.Gateway
                             if (_message.MessageType == MessageType.PlayerSigningIn)
                             {
                                 string[] arr = _message.Content.Split(':');
-                                _callback_createplayer(arr[0], arr[1]);
+                                _callback_createpokeruser(client,_funcStream,arr[0], arr[1]);
                                 Respond(_message, "Player Created", client);
                             }
                             else
                             {
                                 Respond(_message, "Server says Action is good", client);
                             }
-                            _funcStream(_message.Content);
+                            _funcStream(_message);
                            
                             Monitor.PulseAll(_queue);                         
                         }

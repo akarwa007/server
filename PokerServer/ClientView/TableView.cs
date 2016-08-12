@@ -12,7 +12,8 @@ namespace Poker.Server.ClientView
         public string GameValue {get; set;}
         public string TableNo { get; set; }
         public int DealerPosition { get; set; }
-        public List<Tuple<short,string,decimal>> listTable = new List<Tuple<short,string,decimal>>(); // seatno, playername,chipcount
+       // private List<Tuple<short,string,decimal>> listTable = new List<Tuple<short,string,decimal>>(); // seatno, playername,chipcount
+        private List<SeatView> listSeats = new List<SeatView>();
         public TableView(Table table)
         {
             GameName = table.GameName;
@@ -20,15 +21,27 @@ namespace Poker.Server.ClientView
             TableNo = table.TableNo;
             foreach (var x in table.Seats)
             {
-                Tuple<short, string, decimal> t = new Tuple<short, string, decimal>(x.Key.SeatNumber, x.Value.UserName, x.Value.ChipCount);
-                listTable.Add(t);
+                //Tuple<short, string, decimal> t = new Tuple<short, string, decimal>(x.Key.SeatNumber,  x.Value.UserName, x.Value.ChipCount);
+                //listTable.Add(t);
+                SeatView sv = new SeatView(x.Key);
+                listSeats.Add(sv);
             }
         }
+        /*
         public List<Tuple<short, string, decimal>> TableDetails
         {
             get
             {
                 return listTable;
+            }
+        }
+        */
+        public List<SeatView> ListOfSeats
+        {
+            get
+            {
+                return listSeats;
+
             }
         }
     }

@@ -13,6 +13,7 @@ using Poker.Shared;
 using Poker.Gateway;
 using Poker.Common;
 
+
 namespace Poker.Server
 {
     public partial class Form1 : Form
@@ -101,11 +102,11 @@ namespace Poker.Server
 
         private void btnStartServer1_Click(object sender, EventArgs e)
         {  
-            createplayer_callback callback1  = new createplayer_callback(PlayerFactory.Instance.CreatePlayer);
-            // _listOfCallbacks.Add("createplayer",
+            createpokeruser_callback callback1  = new createpokeruser_callback(PokerUserFactory.Instance.CreatePlayer);
+            // _listOfCallbacks.Add("createpokeruser",
             if (!this.ServerStarted)
             {// Start the Server
-                conn = new TCPConnector(new Action<String>(AppendTextBox), new Action<TcpClient>(cleanup_a_client), callback1);
+                conn = new TCPConnector(new Action<Poker.Shared.Message>(AppendTextBox), new Action<TcpClient>(cleanup_a_client), callback1);
                 conn.start();
                 
                 this.ServerStarted = true;
@@ -120,16 +121,16 @@ namespace Poker.Server
 
             }
         }
-        public void AppendTextBox(string value)
+        public void AppendTextBox(Poker.Shared.Message value)
         {
           
                 if (this.InvokeRequired)
                 {
-                    this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
+                    this.Invoke(new Action<Poker.Shared.Message>(AppendTextBox), new object[] { value });
                     return;
                 }
                // this.textBox1.Text += value;
-                this.textBox1.AppendText(value);
+                this.textBox1.AppendText(value.UserName + " : " + value.Content);
                 this.textBox1.AppendText(Environment.NewLine);
            
         }
@@ -141,7 +142,8 @@ namespace Poker.Server
 
         private void btSendCasinoUpdate_Click(object sender, EventArgs e)
         {
-            
+            MessageFactory.SendCasinoMessage();
+            return;
             Poker.Shared.Message m = new Shared.Message("CasinoUpdate", MessageType.CasinoUpdate);
             m.Content = ClientView.CasinoView.Serialize();
             Console.WriteLine(m.Content);
@@ -165,12 +167,16 @@ namespace Poker.Server
         {
             // list the poker clients connected to the server
             // will have ability to disconnect a client too. 
-            dataGridView_Clients.Columns.Add("Name", "Name");
-            dataGridView_Clients.Columns.Add("First", "First");
-            dataGridView_Clients.Columns.Add("Last", "Last");
-            dataGridView_Clients.Rows.Add("one","two","three");
-            
-
+            dataGridView_Clients.Rows.Clear();
+            dataGridView_Clients.Columns.Clear();
+            dataGridView_Clients.Columns.Add("UserName", "UserName");
+            dataGridView_Clients.Columns.Add("TotalChips", "TotalChips");
+            dataGridView_Clients.Columns.Add("ChipsAvailable", "ChipsAvailable");
+            List<PokerUser> users = PokerUserFactory.GetListPokerUsers();
+            foreach(PokerUser user in users)
+            {
+                dataGridView_Clients.Rows.Add(new object[] {user.UserName,user.TotalChips,user.ChipsAvailable });
+            }
             
         }
 
