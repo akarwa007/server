@@ -14,7 +14,12 @@ namespace Poker.Server.ClientView
         private static CasinoView _instance = new CasinoView();
         private CasinoView()
         {
+            refresh();
+        }
+        private void refresh()
+        {
             TableManager t = TableManager.Instance;
+            _list.Clear();
             foreach (var x in t.GetRunningTables())
             {
                 _list.Add(new TableView((Table)x));
@@ -24,6 +29,8 @@ namespace Poker.Server.ClientView
         {
             get
             {
+                if (_instance != null)
+                    _instance.refresh();
                 return _instance;
             }
         }

@@ -28,6 +28,7 @@ namespace Poker.Server
                 }
             }
         }
+        /*
         public bool CreatePlayer(string username, string encyrpted_pwd)
         {
             if (Authenticate(username, encyrpted_pwd))
@@ -37,6 +38,7 @@ namespace Poker.Server
             }
             return false;
         }
+        */
         private bool Authenticate(string username, string encrypted_pwd)
         {
             return true;

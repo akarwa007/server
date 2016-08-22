@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Poker.Shared;
 
 namespace Poker.Server
 {
@@ -19,6 +20,7 @@ namespace Poker.Server
         }
         public  void SendFlop(Table t, Tuple<Card,Card,Card> flop)
         {
+            
         }
         public  void SendTurn(Table t, Card turn)
         {

@@ -130,7 +130,7 @@ namespace Poker.Server
                     return;
                 }
                // this.textBox1.Text += value;
-                this.textBox1.AppendText(value.UserName + " : " + value.Content);
+                this.textBox1.AppendText(value.UserName + " : " + value.MessageType + ":" +  value.Content);
                 this.textBox1.AppendText(Environment.NewLine);
            
         }
@@ -143,24 +143,7 @@ namespace Poker.Server
         private void btSendCasinoUpdate_Click(object sender, EventArgs e)
         {
             MessageFactory.SendCasinoMessage();
-            return;
-            Poker.Shared.Message m = new Shared.Message("CasinoUpdate", MessageType.CasinoUpdate);
-            m.Content = ClientView.CasinoView.Serialize();
-            Console.WriteLine(m.Content);
-            if (conn != null)
-            {
-                lock (conn.Outgoing)
-                {
-                    foreach(var x in conn.Outgoing.Values)
-                    {
-                        lock (x)
-                        {
-                            x.Enqueue(m);
-                            Monitor.PulseAll(x);
-                        }
-                    }
-                }
-            }
+
         }
 
         private void btnViewClients_Click(object sender, EventArgs e)

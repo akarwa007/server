@@ -23,6 +23,7 @@ namespace Poker.Server
                 throw new Exception("Min chips per person cannot be negative");
             _minStartingChipsPerPlayer = minChips;
             _maxStartingChipsPerPlayer = maxChips;
+            initialize();
         }
         private void initialize()
         {
@@ -47,7 +48,7 @@ namespace Poker.Server
             Card card2 = _deck.GetNext();
             Card card3 = _deck.GetNext();
 
-            Tuple<Card, Card, Card> _flop = new Tuple<Card, Card, Card>(card1, card2, card3);
+           _flop = new Tuple<Card, Card, Card>(card1, card2, card3);
             
            }
            return _flop;

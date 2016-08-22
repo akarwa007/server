@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Poker.Shared;
 
 namespace Poker.Server
 {
@@ -14,20 +15,32 @@ namespace Poker.Server
         private decimal _chipcount = 0;
         private Tuple<Card, Card> _holecards;
         private bool _playerStillInHand = false;
-        private string _username;
-        public Player(string username)
+        private Table _table;
+        private PokerUser _pokeruser;
+        public event Action<Player,Poker.Shared.Message> PlayerAction;
+        public Player(PokerUser pokeruser, Table table)
         {
-            _username = username;
+            _table = table;
+            _pokeruser = pokeruser;
+            initialize();
         }
         private void initialize()
         {
-
+            PlayerAction += MessageFactory.SendMessageToPlayer;
+        }
+      
+        public PokerUser PokerUser
+        {
+            get
+            {
+                return _pokeruser;
+            }
         }
         public string UserName
         {
             get
             {
-                return _username;
+                return _pokeruser == null ? "Empty" : _pokeruser.UserName;
             }
         }
         public decimal ChipCount
@@ -42,10 +55,21 @@ namespace Poker.Server
             var string1 = "";
             return string1;
         }
+        private void RaiseEvent(Poker.Shared.Message message)
+        {
+            PlayerAction?.Invoke(this, message);
+        }
         public void AssignHoleCards(Tuple<Card,Card> holecards)
         {
             _holecards = holecards;
             _playerStillInHand = true;
+            //Create the PlayerActionAssignHoleCards message
+            Message message = new Message("HoleCards", MessageType.TableSendHoleCards);
+            message.Content = _table.TableNo + ":";
+            message.Content += holecards.Item1.Rank + ":" + holecards.Item1.Suit + ":" ;
+            message.Content += holecards.Item2.Rank + ":" + holecards.Item2.Suit;
+
+            RaiseEvent(message);
         }
         public bool InHand
         {
@@ -79,6 +103,37 @@ namespace Poker.Server
                     throw new Exception("Money to remove is more than chip count");
                 this._chipcount -= money;
             }
+        }
+        public static bool operator==(Player lhs, Player rhs)
+        {
+            if (System.Object.ReferenceEquals(lhs, rhs))
+                return true;
+            if (((object)lhs == null) || ((object)rhs == null))
+                return false;
+            if ((lhs.UserName == "Empty") || (lhs.UserName == "") || (rhs.UserName == "Empty") || (rhs.UserName == ""))
+                return false;
+            if (lhs.UserName == rhs.UserName)
+                return true;
+
+            return false;
+        }
+        public static bool operator !=(Player lhs, Player rhs)
+        {
+            return !(lhs == rhs);
+        }
+        public override bool Equals(object obj)
+        {
+
+            if (obj is Player)
+            {
+
+                Player other = (Player)obj;
+                if (other.UserName == "Empty")
+                    return false;
+                if (this.UserName == other.UserName)
+                    return true;
+            }
+            return false;
         }
     }
 }

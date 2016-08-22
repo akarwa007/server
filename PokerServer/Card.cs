@@ -12,10 +12,11 @@ namespace Poker.Server
     public class Card : A_Card
     {
         
-        public Card(Suit s, Rank r)
+        public Card(Suit s, Rank r):base(r,s)
         {
             this.Suit = s;
             this.Rank = r;
+            
         }
        
     }

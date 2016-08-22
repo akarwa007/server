@@ -13,11 +13,11 @@ namespace Poker.Server
         {
 
         }
-        public static void SendCasinoMessage()  
+        public static void SendCasinoMessage()
         {
             Poker.Shared.Message m = new Shared.Message("CasinoUpdate", MessageType.CasinoUpdate);
             m.Content = ClientView.CasinoView.Serialize();
-            foreach(PokerUser puser in PokerUserFactory.GetListPokerUsers())
+            foreach (PokerUser puser in PokerUserFactory.GetListPokerUsers())
             {
                 puser.SendMessage(m);
             }
@@ -30,7 +30,78 @@ namespace Poker.Server
             {
                 user.SendMessage(m);
             }
-           
+        }
+        public static void RequestAction(Player p)
+        {
+            // this will wait with the client player and seek an action 
+
+
+        }
+        public static void SendMessageToPlayer(Player p, Message m)
+        {
+            if ((p != null) && (p.UserName != null) && (p.UserName != "Empty"))
+                {
+                    p.PokerUser.SendMessage(m);
+                }
+        }
+
+        public static void SendFlop(Table t, Tuple<Card, Card, Card> flop)
+        {
+            Poker.Shared.Message message = new Shared.Message("", MessageType.TableSendFlop);
+            message.Content = t.TableNo + ":";
+            message.Content += flop.Item1.Rank + ":" + flop.Item1.Suit + ":";
+            message.Content += flop.Item2.Rank + ":" + flop.Item2.Suit + ":";
+            message.Content += flop.Item3.Rank + ":" + flop.Item3.Suit;
+            SendToTablePlayers(t, message);
+        }
+        public static void SendTurn(Table t, Card turn)
+        {
+            Poker.Shared.Message message = new Shared.Message("", MessageType.TableSendTurn);
+            message.Content = t.TableNo + ":";
+            message.Content += turn.Rank + ":" + turn.Suit;
+            SendToTablePlayers(t, message);
+        }
+        public static void SendRiver(Table t, Card river)
+        {
+            Poker.Shared.Message message = new Shared.Message("", MessageType.TableSendRiver);
+            message.Content = t.TableNo + ":";
+            message.Content += river.Rank + ":" + river.Suit;
+            SendToTablePlayers(t, message);
+        }
+       
+        public static void  SendTableUpdateMessage(Table t)
+        {
+            Message m = new Message("TableUpdate", MessageType.TableUpdate);
+            m.Content = (new ClientView.TableView(t)).Serialize();
+            SendToTablePlayers(t, m);
+        }
+        public static void SendToTablePlayers(Table t, Message m)
+        {
+            if ((m == null) || (t == null))
+                return;
+
+            lock (t) // Watch for performance issuses around this call
+            {
+                if ((t.Seats == null) || (t.Seats.Values == null))
+                    return;
+
+                foreach (Player p in t.Seats.Values)
+                {
+                    if ((p != null) && (p.UserName != null) && (p.UserName != "Empty"))
+                    {
+                        p.PokerUser.SendMessage(m);
+                    }
+                }
+                if (t.RemovedPlayer != null)
+                {
+                    Player p = t.RemovedPlayer;
+                    if ((p != null) && (p.UserName != null) && (p.UserName != "Empty"))
+                    {
+                        p.PokerUser.SendMessage(m);
+                    }
+                    t.RemovedPlayer = null;
+                }
+            }
         }
     }
   

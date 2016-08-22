@@ -35,7 +35,7 @@ namespace Poker.Server
             _producerconsumer = new ProducerConsumer(TcpClient, this);
             RegisterForIncomingMessages(new RecieveMessageDelegate(ProcessIncomingMessage));
             RegisterForIncomingMessages(new RecieveMessageDelegate(_incomingmessage_callback));
-            MessageFactory.SendCasinoMessage(this);
+           
         }
         internal TcpClient TcpClient
         {
@@ -58,10 +58,24 @@ namespace Poker.Server
         {
             if (m != null)
             {
+                Console.WriteLine("Inside ProcessinomingMessage " + m.Content);
                 if (m.MessageType == MessageType.PlayerSigningIn)
                 {
                     string[] arr = m.Content.Split(':');
                     UserName = arr[0];
+                    MessageFactory.SendCasinoMessage(this);
+                }
+                if (m.MessageType == MessageType.PlayerJoiningGame)
+                {
+                    string[] arr = m.Content.Split(':');
+                    string tableNo = arr[0];
+                    short seatNo = Convert.ToInt16(arr[1]);
+                    decimal chipCount = Convert.ToDecimal(arr[2]);
+                    Table t = TableManager.Instance.GetTable(tableNo);
+                    if (chipCount >= 0)
+                        t.AddPlayer(new Player(this,t), seatNo);
+                    else
+                        t.RemovePlayerEx(seatNo);
                 }
             }
         }

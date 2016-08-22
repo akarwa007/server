@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 
 namespace Poker.Server.ClientView
 {
@@ -43,6 +46,11 @@ namespace Poker.Server.ClientView
                 return listSeats;
 
             }
+        }
+        public string Serialize()
+        {
+            String jsonString = JsonConvert.SerializeObject(this);
+            return jsonString;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Poker.Server
         private Player _player;
         private Table _table;
         private short _seatno;
-
+        
         public Seat(Player p , Table t, short SeatNum)
         {
             _player = p;
@@ -38,11 +38,17 @@ namespace Poker.Server
         {
             get { return _player.UserName; }
         }
+        public Player RemovePlayer()
+        {
+            Player removed = _player;
+            _player = new Player(null,_table);
+            return removed;
+        }
         public bool RemovePlayer(Player p)
         {
             if (_player == p)
             {
-                _player = null;
+                _player = new Player(null, _table); ;
                 return true;
             }
             throw new Exception("Trying to remove a player not seated on the seat");

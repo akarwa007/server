@@ -12,22 +12,33 @@ namespace Poker.Server
         private AutoResetEvent event1 = new AutoResetEvent(true);
         private Game _game;
         private Table _table;
-        private ClientPlayerManager _CPM = new ClientPlayerManager();
+        private bool _GameInPogress = false;
+       
         
         public GameManager(Game game, Table table)
         {
             _game = game;
             _table = table;
+            _table.TableUpdatedEvent += _table_TableUpdatedEvent;
         }
         public GameManager(Table table)
         {
             _game = new Game(100,500);
             _table = table;
+            _table.TableUpdatedEvent += _table_TableUpdatedEvent;
         }
+
+        private void _table_TableUpdatedEvent(Table table)
+        {
+            if ((table.PlayerCount() >= 3) && (!_GameInPogress))
+                Start();
+        }
+
         public void Start()
         {
             if ((_game == null) || (_table == null))
                 throw new Exception("Table or Game cannot be null");
+            _GameInPogress = true;
             _table.DealerPosition = 1;
             //deal hole cards to seated players
             int playercount = _table.PlayerCount();
@@ -46,7 +57,7 @@ namespace Poker.Server
                 Player player = _table.GetNextPlayer();
                 if (player.InHand)
                 {
-                    _CPM.RequestAction(player); // this connects to client and waits for response.
+                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
                    
                 }
                 playercount--;
@@ -54,7 +65,7 @@ namespace Poker.Server
 
             // deal the flop 
            Tuple<Card,Card,Card> flop =  _game.GetFlop();
-           _CPM.SendFlop(_table, flop);
+           MessageFactory.SendFlop(_table, flop);
 
             // do bet collecting round
 
@@ -65,14 +76,14 @@ namespace Poker.Server
                Player player = _table.GetNextPlayer();
                if (player.InHand)
                {
-                   _CPM.RequestAction(player); // this connects to client and waits for response.
+                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
 
                }
                playercount--;
            }
             //deal the turn 
            Card turn = _game.GetTurn();
-           _CPM.SendTurn(_table, turn);
+            MessageFactory.SendTurn(_table, turn);
 
             // do bet collecting round
 
@@ -83,7 +94,7 @@ namespace Poker.Server
                Player player = _table.GetNextPlayer();
                if (player.InHand)
                {
-                   _CPM.RequestAction(player); // this connects to client and waits for response.
+                   MessageFactory.RequestAction(player); // this connects to client and waits for response.
 
                }
                playercount--;
@@ -91,7 +102,7 @@ namespace Poker.Server
 
             // deal the river
            Card river = _game.GetRiver();
-           _CPM.SendRiver(_table, river);
+            MessageFactory.SendRiver(_table, river);
 
            // do the bet collecting round
 
@@ -102,7 +113,7 @@ namespace Poker.Server
                Player player = _table.GetNextPlayer();
                if (player.InHand)
                {
-                   _CPM.RequestAction(player); // this connects to client and waits for response.
+                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
 
                }
                playercount--;
