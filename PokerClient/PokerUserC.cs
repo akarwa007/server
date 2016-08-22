@@ -65,17 +65,7 @@ namespace PokerClient
             get;
             set;
         }
-        private void ProcessIncomingMessage(Message m)
-        {
-            if (m != null)
-            {
-                if (m.MessageType == MessageType.PlayerSigningIn)
-                {
-                    string[] arr = m.Content.Split(':');
-                    UserName = arr[0];
-                }
-            }
-        }
+    
         public void SendMessage(Message m)
         {
             _producerconsumer.ProduceOutgoing(m);

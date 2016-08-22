@@ -25,6 +25,7 @@ namespace Poker.Shared
             _content = content;
             _messageType = mtype;
         }
+        [JsonProperty("Content", Required = Required.Always)]
         public String Content
         {
             get
@@ -36,6 +37,7 @@ namespace Poker.Shared
                 _content = value;
             }
         }
+        //[JsonProperty("UserName", Required = Required.Always)]
         public String UserName
         {
             get;set;
@@ -120,6 +122,15 @@ namespace Poker.Shared
         PlayerSigningIn,
         PlayerSigningOut,
         PlayerAction,
+        TableSendHoleCards,
+        TableSendFlop,
+        TableSendTurn,
+        TableSendRiver,
+        TableSendWinner,
+        PlayerActionRequestBet,
+        PlayerActionAssignedHoleCards,
+        PlayerReaction,
+        TableUpdate,
         CasinoUpdate,
         GeneralPurpose
     }

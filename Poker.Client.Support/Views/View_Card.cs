@@ -12,6 +12,7 @@ namespace Poker.Client.Support.Views
 {
     public partial class View_Card : UserControl
     {
+        TextBox Left, Right;
         public View_Card()
         {
             InitializeComponent();
@@ -26,35 +27,24 @@ namespace Poker.Client.Support.Views
             int y1 = this.Height;
             int x1 = this.Width;
 
-            int height = y1 / 6;
-            int width = x1 / 6;
+            int height = y1 / 2;
+            int width = x1 / 2;
 
-            // Add to left top corner 
-            TextBox t1 = new TextBox();
-            t1.Multiline = true;
-            t1.Location = new Point(0, 0);
-            t1.Size = new Size(width,height);
+            // Add to left
+            Left = new TextBox();
+            Left.Multiline = true;
+            Left.Location = new Point(0, 0);
+            Left.Size = new Size(width,height);
 
-            // Add to right top corner 
-            TextBox t2 = new TextBox();
-            t2.Multiline = true;
-            t2.Size = new Size(width, height);
-            t2.Location = new Point(x1-width*3, 0);
+            // Add to right
+            Right = new TextBox();
+            Right.Multiline = true;
+            Right.Size = new Size(width, height);
+            Right.Location = new Point(width, height);
 
-
-
-            // Add to left bottom corner 
-            TextBox t3 = new TextBox();
-            t3.Multiline = true;
-            t3.Size = new Size(width, height);
-            t3.Location = new Point(0, y1-height);
+            this.Controls.Add(Left);
+            this.Controls.Add(Right);
            
-            
-
-
-            this.Controls.Add(t1);
-            this.Controls.Add(t2);
-            this.Controls.Add(t3);
         }
     }
 }

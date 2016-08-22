@@ -20,7 +20,7 @@ namespace PokerClient
 
         private void ShellForm_Load(object sender, EventArgs e)
         {
-
+            //this.TransparencyKey = Color.FromArgb(255, 192, 192);
         }
 
         private void ShellForm_FormClosing(object sender, FormClosingEventArgs e)

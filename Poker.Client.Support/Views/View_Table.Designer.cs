@@ -39,6 +39,7 @@
             this.Size = new System.Drawing.Size(475, 243);
             this.Load += new System.EventHandler(this.View_Table_Load);
             this.SizeChanged += new System.EventHandler(this.View_Table_SizeChanged);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.View_Table_Paint);
             this.ResumeLayout(false);
 
         }

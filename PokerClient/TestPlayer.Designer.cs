@@ -62,7 +62,6 @@
             this.btnSubmit.TabIndex = 1;
             this.btnSubmit.Text = "Submit";
             this.btnSubmit.UseVisualStyleBackColor = true;
-            this.btnSubmit.Click += new System.EventHandler(this.btnSubmit_Click);
             // 
             // txtWriter
             // 
@@ -194,6 +193,7 @@
             this.Name = "TestPlayer";
             this.Size = new System.Drawing.Size(605, 283);
             this.Load += new System.EventHandler(this.TestPlayer_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.TestPlayer_Paint);
             this.ResumeLayout(false);
             this.PerformLayout();
 

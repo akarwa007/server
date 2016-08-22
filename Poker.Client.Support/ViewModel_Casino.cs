@@ -29,7 +29,26 @@ namespace Poker.Client.Support
                 return _list;
             }
         }
+        public void Replace(ViewModel_Table vm)
+        {
+            string tableno = vm.TableNo;
+            ViewModel_Table replace = _list.Find(x => x.TableNo == tableno);
+            if (replace != null)
+            {
+                _list.Remove(replace);
+                _list.Add(vm);
+            }
 
+        }
+        public ViewModel_Table GetLatest(ViewModel_Table vm)
+        {
+            if (vm == null)
+                return vm;
+            var fresh = _list.Find(x => x.TableNo == vm.TableNo);
+            if (fresh != null)
+                return fresh;
+            return null;
+        }
      
     }
 }

@@ -22,16 +22,12 @@ namespace PokerClient
 {
     public partial class TestPlayer : UserControl
     {
+        static int RefCount = 0;
         bool _Connected = false;
         bool _Authenticated = false;
         TcpClient _client = null;
 
-        Poker.Shared.Message _firstMessage;
         Poker.Shared.Message _message;
-        Queue<Poker.Shared.Message> _queue_outgoing = new Queue<Poker.Shared.Message>();
-        Queue<Poker.Shared.Message> _queue_incoming = new Queue<Poker.Shared.Message>();
-        List<Poker.Shared.Message> _queue_pending = new List<Poker.Shared.Message>();
-        List<Thread> _threads = new List<Thread>();
 
         ShellForm _shellform;
         ViewModel_Casino _casinoModel;
@@ -43,12 +39,12 @@ namespace PokerClient
         {
             //init();
             InitializeComponent();
+            txtUsername.Text = txtUsername.Text + (++TestPlayer.RefCount).ToString();
         }
         private void init(string username, string password)
         {
             _context = new PokerClientContext();
           
-
             _shellform = new ShellForm();
             _casinoModel = new ViewModel_Casino(username);
             
@@ -64,9 +60,19 @@ namespace PokerClient
             _pokeruser = new PokerUserC(_client, null, username, password);
             _context.PokerUser = _pokeruser;
             _context.MessageFactory = new MessageFactory(_pokeruser);
-            _context.MessageFactory.RegisterCallback(_casinoView.CallBack, MessageType.CasinoUpdate);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.CasinoUpdate);
+            _context.MessageFactory.RegisterCallback(this.SetReceivedMessage, MessageType.GeneralPurpose);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableUpdate);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage,MessageType.PlayerAction);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.PlayerActionRequestBet);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendHoleCards);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendFlop);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendTurn);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendRiver);
+            _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendWinner);
             _pokeruser.setContext(_context);
             _casinoView.JoinedTableEvent += _context.MessageFactory.SendTableJoinMessage;
+            
         }
 
         private bool Connected
@@ -79,107 +85,60 @@ namespace PokerClient
             {
                 _Connected = value;
                 if (_Connected)
-                    btnConnect.Text = "Disconnect";
+                    SetButtonText("Disconnect");
                 else
-                    btnConnect.Text = "Connect";
+                    SetButtonText("Connect");
             }
+        }
+        public void SetButtonText(string value)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string>(SetButtonText), new object[] { value });
+                return;
+            }       
+            this.btnConnect.Text = value;
+        }
+        public void SetReceivedMessage(Poker.Shared.Message value)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<Poker.Shared.Message>(SetReceivedMessage), new object[] { value });
+                return;
+            }
+            this.txtReceiever.AppendText(value.MessageType.ToString() + "-- Content Size -> " + value.Content.Length.ToString());
+            this.txtReceiever.AppendText(Environment.NewLine);
         }
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            if ((_client == null) || (_client.Connected == false))
-            {
-                _client = new TcpClient("localhost", 8113);
+            Task.Run(() =>
+           {
+               if ((_client == null) || (_client.Connected == false))
+               {
+                   _client = new TcpClient("localhost", 8113);
 
-                if (_client.Connected)
-                {
-                    this.Connected = true;
-                    string content = txtUsername.Text + ":" + txtPassword.Text;
-                    _firstMessage = new Poker.Shared.Message(content, MessageType.PlayerSigningIn);
-                    _queue_outgoing.Enqueue(_firstMessage);
-                    init(txtUsername.Text, txtUsername.Text);
-
-                   // forknewthread(_client);
-                }
-            }
-            else // you want to disconnect
-            {
-                _client.Close();
-                if (_client.Connected == false)
-                {
-                    this.Connected = false;
-                    foreach(Thread t in _threads)
-                    {
-                        t.Abort();
+                   if (_client.Connected)
+                   {
+                       this.Connected = true;
+                       string content = txtUsername.Text + ":" + txtPassword.Text;
+                       //_firstMessage = new Poker.Shared.Message(content, MessageType.PlayerSigningIn);
+                       //_queue_outgoing.Enqueue(_firstMessage);
+                       init(txtUsername.Text, txtPassword.Text);
                     }
-                }
-            }
+               }
+               else // you want to disconnect
+                {
+                   _client.Close();
+                   if (_client.Connected == false)
+                   {
+                       this.Connected = false;
+                     // do some disconnect code
+                   }
+               }
+           });
             
         }
-        private void forknewthread( TcpClient client)
-        {
-            Thread readerthread = new Thread(
-               () => func_reader(this.txtReceiever, client));
-
-            _threads.Add(readerthread);
-            readerthread.Start();
-
-            Thread writerthread = new Thread(
-              () => func_writer(client));
-
-            _threads.Add(writerthread);
-            writerthread.Start();
-        }
-        private Poker.Shared.Message GetMatch(Poker.Shared.Message message)
-        {
-            // go through pending queue 
-            if (_queue_pending.Count > 0)
-            {
-                var match = _queue_pending.Where(x => x.MessageID == message.MessageID).FirstOrDefault();
-                if (match != null)
-                {
-                    _queue_pending.Remove(match);
-                }
-                return match;
-            }
-            return null;
-        }
-        private void func_reader(RichTextBox txtbox, TcpClient client)
-        {
-            NetworkStream ns = client.GetStream();
-            StreamReader reader = new StreamReader(ns);
-            while (client.Connected)
-            {
-                
-                Poker.Shared.Message message;
-                while ((message = MessageProcessor.Process(reader)) != null)
-                {
-                   // AppendTextBox(txtbox, message);
-                    //check for callback
-                    Poker.Shared.Message matching = GetMatch(message);
-                    if (matching != null)
-                    {
-                        matching.Callback(message);
-                    }
-                    else
-                    {
-                        AppendTextBox(this.txtReceiever, message);
-                        ProcessMessage(message);
-                    }
-
-                }
-               
-
-            }
-
-        }
-        private void ProcessMessage(Poker.Shared.Message message)
-        {
-            if (message.MessageType == MessageType.CasinoUpdate)
-            {
-                ViewModel_Casino vm = JsonConvert.DeserializeObject<ViewModel_Casino>(message.Content);
-                _casinoView.UpdateModel(vm);
-            }
-        }
+        
         public void AppendTextBox(RichTextBox txtbox, Poker.Shared.Message value)
         {
             if (this.InvokeRequired)
@@ -189,53 +148,10 @@ namespace PokerClient
             }
             txtbox.Text += value.Content;
         }
-        private void func_writer( TcpClient client)
-        {
-            NetworkStream ns = client.GetStream();
-            StreamWriter sw = new StreamWriter(ns);
-          
-            while (client.Connected)
-            {
-                lock (_queue_outgoing)
-                {
-                    while (_queue_outgoing.Count == 0)
-                    {
-                        Monitor.Wait(_queue_outgoing);
-                    }
-                    while (_queue_outgoing.Count > 0)
-                    {
-                        Poker.Shared.Message message = _queue_outgoing.Dequeue();
-                        if (message.Callback != null) // Should first ensure that message has been sent and then put in pending queue.
-                            _queue_pending.Add(message);
-                        string jsonString = message.Serialize();
-
-                        sw.WriteLine(jsonString);
-                        sw.Flush();
-                        
-                    }
-                }
-            }
-
-
-        }
-
-        private void btnSubmit_Click(object sender, EventArgs e)
-        {
-            lock (_queue_outgoing)
-            {
-                _queue_outgoing.Enqueue(_message);
-                Monitor.PulseAll(_queue_outgoing);
-            }
-        }
-
+     
         private void TestPlayer_Load(object sender, EventArgs e)
         {
-            /*
-            if (this.Connected)
-                btnConnect.Text = "Disconnect";
-            else
-                btnConnect.Text = "Connect";
-              */
+         
            
         }
 
@@ -280,9 +196,16 @@ namespace PokerClient
 
         private void btnCasino_Click(object sender, EventArgs e)
         {
-            _shellform.Show();
-            
+            if (_shellform != null)
+            {
+                _shellform.Text = "Casino View for " + _casinoView.UserName;
+                _shellform.Show();
+            }
         }
 
+        private void TestPlayer_Paint(object sender, PaintEventArgs e)
+        {
+           
+        }
     }
 }

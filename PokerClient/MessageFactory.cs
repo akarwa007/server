@@ -9,7 +9,7 @@ namespace PokerClient
 {
     public class MessageFactory
     {
-        static PokerUserC _user;
+        PokerUserC _user;
         Dictionary<MessageType, Action<Message>> _dict = new Dictionary<MessageType, Action<Message>>();
         public MessageFactory(PokerUserC user)
         {
@@ -40,10 +40,12 @@ namespace PokerClient
         }
         public void ProcessMessage(Poker.Shared.Message message)
         {
-            if (message.MessageType == MessageType.CasinoUpdate)
-            {
-                _dict[message.MessageType].Invoke(message);
-            }
+
+            Console.WriteLine("Incoming message for " + message.UserName + " " + message.MessageType + " size=" + message.Content.Length.ToString());
+            if ((message != null)  && (_dict.ContainsKey(message.MessageType)))
+                _dict[message.MessageType](message);
+            if ((message != null) && (_dict.ContainsKey(MessageType.GeneralPurpose)))
+                _dict[MessageType.GeneralPurpose](message);
         }
 
     }

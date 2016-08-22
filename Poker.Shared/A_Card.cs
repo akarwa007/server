@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Poker.Shared
 {
-    public abstract class A_Card
+    public  class A_Card
     {
-        public A_Card()
+        public A_Card(Rank r, Suit s)
         {
+            Rank = r;
+            Suit = s;
         }
         public Suit Suit
         {
@@ -20,6 +24,11 @@ namespace Poker.Shared
         {
             get;
             protected set;
+        }
+        public string Serialize()
+        {
+            string jsonString = JsonConvert.SerializeObject(this);
+            return jsonString;
         }
     }
     public enum Suit

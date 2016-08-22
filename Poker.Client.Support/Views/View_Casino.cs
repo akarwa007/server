@@ -16,7 +16,10 @@ namespace Poker.Client.Support.Views
     public partial class View_Casino : UserControl
     {
         ViewModel_Casino _casinoModel;
+        ViewModel_Table _detailPanelModel;
+        Dictionary<string, View_Table> _cache_ViewTables = new Dictionary<string, View_Table>();
         public event JoinedTableHandler JoinedTableEvent;
+        Dictionary<string, Action<Shared.Message>> CardEvent = new Dictionary<string, Action<Shared.Message>>();
         public View_Casino()
         {
             InitializeComponent();
@@ -28,11 +31,13 @@ namespace Poker.Client.Support.Views
         public void UpdateModel(ViewModel_Casino model)
         {
             _casinoModel = model;
-         
+            refresh();
+        }
+        private void refresh()
+        {
             ClearTreeView();
-          
-          
-            var groups = model.ListOfTables.GroupBy(x => x.GameName, x => new { x.GameValue , x});
+
+            var groups = _casinoModel.ListOfTables.GroupBy(x => x.GameName, x => new { x.GameValue, x });
             foreach (var j in groups)
             {
                 TreeNode node = new TreeNode(j.Key.ToString());
@@ -44,7 +49,46 @@ namespace Poker.Client.Support.Views
                 }
                 AddTreeNodes(node);
             }
-       
+        }
+        public void TableUpdateMessage(Poker.Shared.Message message)
+        {
+            if (message.MessageType == MessageType.TableUpdate)
+            {
+                ViewModel_Table vm_table = JsonConvert.DeserializeObject<ViewModel_Table>(message.Content);
+                if (_casinoModel != null)
+                {
+                    _casinoModel.Replace(vm_table);
+                }
+                Console.WriteLine("Recevied table update message for TableNo -- " + vm_table.TableNo);
+                if ((_detailPanelModel != null) && (_detailPanelModel.TableNo == vm_table.TableNo))
+                {
+                    SetDetailPanel(vm_table);
+                }
+            }
+        }
+        private void PlayeActionMessage(Poker.Shared.Message message)
+        {
+
+        }
+        private void CardEventMessage(Poker.Shared.Message message)
+        {
+            string[] arr = message.Content.Split(':');
+            string tableno = arr[0];
+            
+            this.CardEvent[tableno].Invoke(message);
+        }
+        public void ProcessMessage(Poker.Shared.Message m)
+        {
+            if (m.MessageType == MessageType.CasinoUpdate)
+                CasinoUpdateMessage(m);
+            else if (m.MessageType == MessageType.TableUpdate)
+                TableUpdateMessage(m);
+            else if (m.MessageType == MessageType.PlayerAction)
+                PlayeActionMessage(m);
+            else if (m.MessageType == MessageType.TableSendHoleCards)
+                CardEventMessage(m);
+
+
         }
         private void ClearTreeView()
         {
@@ -65,7 +109,7 @@ namespace Poker.Client.Support.Views
             this.treeView1.Nodes.Add(node);
            
         }
-        public void CallBack(Poker.Shared.Message message)
+        private void CasinoUpdateMessage(Poker.Shared.Message message)
         {
             if (message.MessageType == MessageType.CasinoUpdate)
             {
@@ -77,17 +121,33 @@ namespace Poker.Client.Support.Views
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (e.Action == TreeViewAction.Unknown)
+                return;
             ViewModel_Table vm = (ViewModel_Table)e.Node.Tag;
+            ViewModel_Table latest = _casinoModel.GetLatest(vm);
+            SetDetailPanel(latest);
+        }
+        private void SetDetailPanel(ViewModel_Table vm)
+        {
             vm.UserName = this.UserName;
             View_Table vt = new View_Table(vm);
             vt.JoinedTableEvent += Vt_JoinedTableEvent;
+           // if (this.CardEvent.ContainsKey(vm.TableNo))
+            //    this.CardEvent[vm.TableNo] += vt.ProcessMessage;
+            //else
+            this.CardEvent[vm.TableNo] = new Action<Shared.Message>(vt.ProcessMessage);
             vt.SuspendLayout();
             vt.Height = splitContainer1.Panel2.Height;
             vt.Width = splitContainer1.Panel2.Width;
-            splitContainer1.Panel2.Controls.Clear();
-            splitContainer1.Panel2.Controls.Add(vt);
+         
+            splitContainer1.Invoke(new Action(() => splitContainer1.Panel2.Controls.Clear()));
+            splitContainer1.Invoke(new Action(() => splitContainer1.Panel2.Controls.Add(vt)));
+
             vt.PerformLayout();
+            _detailPanelModel = vm;
             
+            //_cache_ViewTables[vm.TableNo] = vt;
+          
         }
 
         private void Vt_JoinedTableEvent(string TableNo, short SeatNo, decimal ChipCounts)

@@ -76,6 +76,7 @@ namespace PokerClient
                     while (queueOutgoing.Count > 0)
                     {
                         Message message = queueOutgoing.Dequeue();
+                        message.UserName = this._pokerUser.UserName;
                         try
                         {
                             sw.WriteLine(message.Serialize());
