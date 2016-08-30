@@ -12,6 +12,7 @@ namespace Poker.Client.Support.Views
     {
         static View_Deck _instance = new View_Deck();
         Dictionary<string, Bitmap> _dict = new Dictionary<string, Bitmap>();
+        Bitmap _backcard;
         string[] rank = { "2", "3", "4", "5", "6", "7", "8", "9", "T", "K", "Q", "J", "A" };
         string[] suit = { "S", "H", "C", "D" };
         Dictionary<Rank, string> dictRank;
@@ -74,6 +75,13 @@ namespace Poker.Client.Support.Views
                 {Suit.Heart,"H" },
                 {Suit.Spade,"S" }
             };
+
+            // load and store back card
+
+            path = "resources/back_card.png"; // @"C:\Programs\theBorgata\BorgataPoker\Images\NewGameTable\Modern\cards.png";
+            
+            _backcard= new Bitmap(path, true);
+
         }
         public static View_Deck Instance
         {
@@ -81,10 +89,16 @@ namespace Poker.Client.Support.Views
         }
         public Bitmap GetCard(A_Card card)
         {
+            if ((card.Rank == Rank.Blank) || (card.Suit == Suit.Blank))
+                return GetBackCard();
             string r = dictRank[card.Rank];
             string s = dictSuit[card.Suit];
             Bitmap result = _dict[s+r];
             return result;
+        }
+        public Bitmap GetBackCard()
+        {
+            return _backcard;
         }
     }
 }

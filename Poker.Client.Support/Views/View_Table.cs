@@ -16,6 +16,8 @@ namespace Poker.Client.Support.Views
     {
         ViewModel_Table _vm_table = null;
         public event JoinedTableHandler JoinedTableEvent;
+        public event ReceiveBetHandler ReceiveBetEvent;
+
         View_Card VCard_flop1, VCard_flop2, VCard_flop3, VCard_turn, VCard_river;
         Label lflop1, lflop2, lflop3, lturn, lriver;
         short myseat = -1; // means not occupying any seat
@@ -29,25 +31,26 @@ namespace Poker.Client.Support.Views
 
         private void View_Table_Paint(object sender, PaintEventArgs e)
         {
-            return;
-            SolidBrush sb = new SolidBrush(Color.DarkGreen);
-            Point point;
-            Size size;
-            foreach (Control ctrl in this.Controls)
-            {
-                if (ctrl is View_Seat)
-                {
-                     point = new Point(ctrl.Left - 1, ctrl.Top - 1);
-                     size = new Size(ctrl.Width + 1, ctrl.Height + 1);
-                   // e.Graphics.DrawRectangle(SystemPens.ControlDark, new Rectangle(point, size));
-                    // e.Graphics.FillEllipse(sb, new Rectangle(point, size));
-                }
-            }
-            
-            //e.Graphics.DrawRectangle(SystemPens.ControlDark,new Rectangle(point,size));
-           // e.Graphics.FillEllipse(sb, new Rectangle(point,size));
-        }
+          
 
+        }
+        private void repaint()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate {
+                    this.Controls.Clear();
+
+                    RenderControls();
+                });
+            }
+            else
+            {
+                this.Controls.Clear();
+
+                RenderControls();
+            }
+        }
         public string UserName
         {
             get
@@ -73,33 +76,33 @@ namespace Poker.Client.Support.Views
             {
                 int delta_width = seatwidth / 4;
                 int delta_shift = seatwidth / 2;
-
-                this.VCard_flop1 = new View_Card();
+                
+                this.VCard_flop1 = new View_Card(_vm_table.Flop1);
                 this.VCard_flop1.Size = new Size(this.Width / 13, this.Height / 6);
                 int seatloc_1_x = delta_shift + seatwidth * 3;
                 this.VCard_flop1.Location = new Point(seatloc_1_x, y1/2 - seatheight/2);
                 this.Controls.Add(VCard_flop1);
 
                 
-                this.VCard_flop2 = new View_Card();
+                this.VCard_flop2 = new View_Card(_vm_table.Flop2);
                 this.VCard_flop2.Size = new Size(this.Width / 13, this.Height / 6);
                 int seatloc_2_x = seatloc_1_x + seatwidth + delta_width;
                 this.VCard_flop2.Location = new Point(seatloc_2_x, y1 / 2 - seatheight / 2);
                 this.Controls.Add(VCard_flop2);
 
-                this.VCard_flop3 = new View_Card();
+                this.VCard_flop3 = new View_Card(_vm_table.Flop3);
                 this.VCard_flop3.Size = new Size(this.Width / 13, this.Height / 6);
                 int seatloc_3_x = seatloc_2_x + seatwidth + delta_width;
                 this.VCard_flop3.Location = new Point(seatloc_3_x, y1 / 2 - seatheight / 2);
                 this.Controls.Add(VCard_flop3);
 
-                this.VCard_turn = new View_Card();
+                this.VCard_turn = new View_Card(_vm_table.Turn);
                 this.VCard_turn.Size = new Size(this.Width / 13, this.Height / 6);
                 int seatloc_4_x = seatloc_3_x + seatwidth + delta_width;
                 this.VCard_turn.Location = new Point(seatloc_4_x, y1 / 2 - seatheight / 2);
                 this.Controls.Add(VCard_turn);
 
-                this.VCard_river = new View_Card();
+                this.VCard_river = new View_Card(_vm_table.River);
                 this.VCard_river.Size = new Size(this.Width / 13, this.Height / 6);
                 int seatloc_5_x = seatloc_4_x + seatwidth + delta_width;
                 this.VCard_river.Location = new Point(seatloc_5_x, y1 / 2 - seatheight / 2);
@@ -172,22 +175,6 @@ namespace Poker.Client.Support.Views
                 this.Controls.Add(l3);
             }
             
-            
-            /*
-            CircularProgressBar.CircularProgressBar c = new CircularProgressBar.CircularProgressBar();
-            c.Value = 50;
-            c.Location = new Point(100, 100);
-            c.Size = new Size(200, 200);
-            c.AnimationSpeed = 5000;
-            
-            c.MarqueeAnimationSpeed = 1000;
-            c.StartAngle = 0;
-            c.Step = 5;
-            c.Style = ProgressBarStyle.Marquee;
-             this.Controls.Add(c);
-           */
-
-
             short seatno = 1;
             View_Seat seat1 = null;
             
@@ -203,6 +190,7 @@ namespace Poker.Client.Support.Views
                 seat1 = new View_Seat(vm_seat);
                 Dict_View_Seats[seatno] = seat1;
                 seat1.JoinedTableEvent += Seat_JoinedTableEvent;
+                seat1.ReceiveBetEvent += Seat_ReceiveBetEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
@@ -220,6 +208,7 @@ namespace Poker.Client.Support.Views
                 seat1 = new View_Seat(vm_seat);
                 Dict_View_Seats[seatno] = seat1;
                 seat1.JoinedTableEvent += Seat_JoinedTableEvent;
+                seat1.ReceiveBetEvent += Seat_ReceiveBetEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
@@ -236,6 +225,7 @@ namespace Poker.Client.Support.Views
                 seat1 = new View_Seat(vm_seat);
                 Dict_View_Seats[seatno] = seat1;
                 seat1.JoinedTableEvent += Seat_JoinedTableEvent;
+                seat1.ReceiveBetEvent += Seat_ReceiveBetEvent;
                 seat1.Size = new Size(seatwidth, seatheight);
                 seat1.Location = new Point(x, y);
                 this.Controls.Add(seat1);
@@ -261,6 +251,11 @@ namespace Poker.Client.Support.Views
             if (JoinedTableEvent != null)
                 JoinedTableEvent.Invoke(TableNo, SeatNo, ChipCounts);
         }
+        private void Seat_ReceiveBetEvent(string TableNo, decimal ChipCounts)
+        {
+            if (ReceiveBetEvent != null)
+                ReceiveBetEvent.Invoke(TableNo, ChipCounts);
+        }
         public void ProcessMessage(Poker.Shared.Message message)
         {
             if (message == null)
@@ -279,6 +274,9 @@ namespace Poker.Client.Support.Views
                 case MessageType.TableSendRiver:
                     OnReceiveRiver(PConvert.ToSingleCard(message));
                     break;
+                case MessageType.PlayerActionRequestBet:
+                    OnReceiveRequestBet(message);
+                    break;
                 default:
                     throw new Exception("Not sure what message is this");
             }
@@ -287,21 +285,51 @@ namespace Poker.Client.Support.Views
         {
             if (MySeatNo > 0)
             {
+                // Need to change this to assign to the view model of the seat rather than the view of the seat.
                 Dict_View_Seats[MySeatNo].Assign_HoleCards(holecards);
+                this.repaint();
+                Console.WriteLine("OnReceiveHoleCards for  " + this.UserName + holecards.ToString());
             }
             Console.WriteLine("OnReceiveHoleCards " + holecards.ToString());
         }
         public void OnReceiveFlop(Tuple<A_Card,A_Card,A_Card> flop)
         {
+            this._vm_table.Flop1.Update(flop.Item1);
+            this._vm_table.Flop2.Update(flop.Item2);
+            this._vm_table.Flop3.Update(flop.Item3);
+
+            this.VCard_flop1.repaint();
+            this.VCard_flop2.repaint();
+            this.VCard_flop3.repaint();
+
             Console.WriteLine("OnReceiveFlop " + flop.ToString());
         }
         public void OnReceiveTurn(A_Card turn)
         {
+            this._vm_table.Turn.Update(turn);
+            this.VCard_turn.repaint();
+           
             Console.WriteLine("OnReceiveTurn " + turn.ToString());
         }
         public void OnReceiveRiver(A_Card river)
         {
+            this._vm_table.River.Update(river);
+            this.VCard_river.repaint();
+           
             Console.WriteLine("OnReceiveRiver " + river.ToString());
+        }
+        public void OnReceiveRequestBet(Shared.Message m)
+        {
+            string[] arr = m.Content.Split(':');
+            string tableno = arr[0];
+
+            if (MySeatNo > 0)
+            {
+                // Need to change this to assign to the view model of the seat rather than the view of the seat.
+                Dict_View_Seats[MySeatNo].SimulateRequestBet(arr[1]);
+               // this.repaint();
+            }
+            Console.WriteLine("OnReceiveRequestBet " + m.Content);
         }
 
         private void View_Table_Load(object sender, EventArgs e)
@@ -318,9 +346,7 @@ namespace Poker.Client.Support.Views
 
         private void View_Table_SizeChanged(object sender, EventArgs e)
         {
-            this.Controls.Clear();
-            
-            RenderControls();
+            repaint();
 
         }
 

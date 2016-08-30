@@ -23,6 +23,17 @@ namespace PokerClient
             {
                 _user.SendMessage(m);
             }
+           // Console.WriteLine("MessageFactory:Sent TableJoin Message for user " + this._user.UserName);
+        }
+        public void SendReceiveBetMessage(string TableNo, decimal ChipCount)
+        {
+            string content = TableNo + ":" + ChipCount;
+            Poker.Shared.Message m = new Poker.Shared.Message(content, MessageType.PlayerAction);
+            if (_user != null)
+            {
+                _user.SendMessage(m);
+            }
+            Console.WriteLine("MessageFactory:Sent ReceiveBet Message for user " + this._user.UserName);
         }
         public void RegisterCallback(Action<Message> callback , MessageType messageType)
         {

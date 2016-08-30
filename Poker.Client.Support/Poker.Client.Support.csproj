@@ -154,6 +154,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="resources\back_card.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="resources\Cards.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

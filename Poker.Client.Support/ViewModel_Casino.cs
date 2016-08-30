@@ -35,6 +35,17 @@ namespace Poker.Client.Support
             ViewModel_Table replace = _list.Find(x => x.TableNo == tableno);
             if (replace != null)
             {
+                // HACK HACK HACK
+                // copy the holecards from replace to vm
+                foreach(var seat in vm.ListOfSeats)
+                {
+                    seat.HoleCard_1 = replace.get_VM_Seat(seat.SeatNo).HoleCard_1;
+                    seat.HoleCard_2 = replace.get_VM_Seat(seat.SeatNo).HoleCard_2;
+
+                }
+                // copy the flop,turn,river 
+                
+
                 _list.Remove(replace);
                 _list.Add(vm);
             }

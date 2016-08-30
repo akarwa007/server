@@ -19,7 +19,9 @@ namespace Poker.Client.Support.Views
         ViewModel_Table _detailPanelModel;
         Dictionary<string, View_Table> _cache_ViewTables = new Dictionary<string, View_Table>();
         public event JoinedTableHandler JoinedTableEvent;
+        public event ReceiveBetHandler ReceiveBetEvent;
         Dictionary<string, Action<Shared.Message>> CardEvent = new Dictionary<string, Action<Shared.Message>>();
+        Dictionary<string, Action<Shared.Message>> BetEvent = new Dictionary<string, Action<Shared.Message>>();
         public View_Casino()
         {
             InitializeComponent();
@@ -74,8 +76,19 @@ namespace Poker.Client.Support.Views
         {
             string[] arr = message.Content.Split(':');
             string tableno = arr[0];
-            
-            this.CardEvent[tableno].Invoke(message);
+            lock (this.CardEvent)
+            {
+                this.CardEvent[tableno].Invoke(message);
+            }
+        }
+        private void BetEventMessage(Poker.Shared.Message message)
+        {
+            string[] arr = message.Content.Split(':');
+            string tableno = arr[0];
+            lock (this.BetEvent)
+            {
+                this.BetEvent[tableno].Invoke(message);
+            }
         }
         public void ProcessMessage(Poker.Shared.Message m)
         {
@@ -83,9 +96,15 @@ namespace Poker.Client.Support.Views
                 CasinoUpdateMessage(m);
             else if (m.MessageType == MessageType.TableUpdate)
                 TableUpdateMessage(m);
-            else if (m.MessageType == MessageType.PlayerAction)
-                PlayeActionMessage(m);
+            else if (m.MessageType == MessageType.PlayerActionRequestBet)
+                BetEventMessage(m);
             else if (m.MessageType == MessageType.TableSendHoleCards)
+                CardEventMessage(m);
+            else if (m.MessageType == MessageType.TableSendFlop)
+                CardEventMessage(m);
+            else if (m.MessageType == MessageType.TableSendTurn)
+                CardEventMessage(m);
+            else if (m.MessageType == MessageType.TableSendRiver)
                 CardEventMessage(m);
 
 
@@ -125,6 +144,8 @@ namespace Poker.Client.Support.Views
                 return;
             ViewModel_Table vm = (ViewModel_Table)e.Node.Tag;
             ViewModel_Table latest = _casinoModel.GetLatest(vm);
+            if (vm == null)
+                return;
             SetDetailPanel(latest);
         }
         private void SetDetailPanel(ViewModel_Table vm)
@@ -132,10 +153,15 @@ namespace Poker.Client.Support.Views
             vm.UserName = this.UserName;
             View_Table vt = new View_Table(vm);
             vt.JoinedTableEvent += Vt_JoinedTableEvent;
-           // if (this.CardEvent.ContainsKey(vm.TableNo))
-            //    this.CardEvent[vm.TableNo] += vt.ProcessMessage;
-            //else
-            this.CardEvent[vm.TableNo] = new Action<Shared.Message>(vt.ProcessMessage);
+            vt.ReceiveBetEvent += Vt_ReceiveBetEvent;
+            lock (this.CardEvent)
+            {
+                this.CardEvent[vm.TableNo] = new Action<Shared.Message>(vt.ProcessMessage);
+            }
+            lock(this.BetEvent)
+            {
+                this.BetEvent[vm.TableNo] = new Action<Shared.Message>(vt.ProcessMessage);
+            }
             vt.SuspendLayout();
             vt.Height = splitContainer1.Panel2.Height;
             vt.Width = splitContainer1.Panel2.Width;
@@ -154,6 +180,11 @@ namespace Poker.Client.Support.Views
         {
             if (JoinedTableEvent != null)
                 JoinedTableEvent.Invoke(TableNo, SeatNo, ChipCounts);
+        }
+        private void Vt_ReceiveBetEvent(string TableNo, decimal ChipCounts)
+        {
+            if (ReceiveBetEvent != null)
+                ReceiveBetEvent.Invoke(TableNo, ChipCounts);
         }
 
         private void splitContainer1_Panel2_SizeChanged(object sender, EventArgs e)

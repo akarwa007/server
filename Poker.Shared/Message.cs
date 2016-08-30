@@ -143,6 +143,6 @@ namespace Poker.Shared
     }
 
     public delegate void JoinedTableHandler(string TableNo, short SeatNo, decimal ChipCounts);
-
+    public delegate void ReceiveBetHandler(string TableNo, decimal betsize); // betsize = -1 is fold
 
 }

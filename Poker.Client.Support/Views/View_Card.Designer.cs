@@ -38,6 +38,7 @@
             this.Name = "View_Card";
             this.Size = new System.Drawing.Size(72, 133);
             this.Load += new System.EventHandler(this.View_Card_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.View_Card_Paint);
             this.ResumeLayout(false);
 
         }

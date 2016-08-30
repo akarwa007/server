@@ -33,6 +33,7 @@ namespace PokerClient
             newpage.BackColor = bk_color[color_index % 2];
             color_index++;
             newpage.Controls.Add(newplayer);
+            newplayer.Dock = DockStyle.Fill;
             tabcount++;
             }catch(Exception e1)
             {
@@ -54,6 +55,12 @@ namespace PokerClient
         private void TestForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void TestForm_Resize(object sender, EventArgs e)
+        {
+            this.tabControl1.Location = new Point(0, 50);
+            this.tabControl1.Size = new Size(this.Width, this.Height - 50);
         }
     }
 }

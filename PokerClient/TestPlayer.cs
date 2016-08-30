@@ -55,8 +55,15 @@ namespace PokerClient
             _shellform.AutoSize = false;
             _casinoView.Dock = DockStyle.Fill;
             _casinoView.AutoSize = false;
-            _shellform.Controls.Add(_casinoView);
+            //_shellform.Controls.Add(_casinoView);
+            //this.Controls.Add(_casinoView);
+           // this._casinoView.Location = new Point(0, 80);
+           // this._casinoView.Size = new Size(this.Width, this.Height - 80);
+            this.Invoke((MethodInvoker)delegate {
+                this.panel1.Controls.Add(_casinoView);
+            });
 
+       
             _pokeruser = new PokerUserC(_client, null, username, password);
             _context.PokerUser = _pokeruser;
             _context.MessageFactory = new MessageFactory(_pokeruser);
@@ -72,6 +79,7 @@ namespace PokerClient
             _context.MessageFactory.RegisterCallback(_casinoView.ProcessMessage, MessageType.TableSendWinner);
             _pokeruser.setContext(_context);
             _casinoView.JoinedTableEvent += _context.MessageFactory.SendTableJoinMessage;
+            _casinoView.ReceiveBetEvent += _context.MessageFactory.SendReceiveBetMessage;
             
         }
 
@@ -115,9 +123,16 @@ namespace PokerClient
            {
                if ((_client == null) || (_client.Connected == false))
                {
-                   _client = new TcpClient("localhost", 8113);
-
-                   if (_client.Connected)
+                   try
+                   {
+                       _client = new TcpClient("localhost", 8113);
+                   }
+                   catch(Exception ee)
+                   {
+                       AppendTextBox(this.txtReceiever, new Poker.Shared.Message(ee.Message, MessageType.GeneralPurpose));
+                       Console.WriteLine(ee.Message);
+                   }
+                   if ((_client != null) && (_client.Connected))
                    {
                        this.Connected = true;
                        string content = txtUsername.Text + ":" + txtPassword.Text;
@@ -155,44 +170,8 @@ namespace PokerClient
            
         }
 
-        private void btnSignin_Click(object sender, EventArgs e)
-        {
-            this.txtWriter.Text = "PlayerSigningIn:" + this.txtUsername.Text;
-            string content = txtUsername.Text + ":" + txtPassword.Text;
-            _message = new Poker.Shared.Message(content, MessageType.PlayerSigningIn);
-        }
-
-        private void btnSignout_Click(object sender, EventArgs e)
-        {
-            this.txtWriter.Text = "PlayerSigningOut:" + this.txtUsername.Text;
-            _message = new Poker.Shared.Message(this.txtWriter.Text, MessageType.PlayerSigningOut);
-        }
-
-        private void btnJoinGame_Click(object sender, EventArgs e)
-        {
-            this.txtWriter.Text = "PlayerJoiningGame:" + this.txtUsername.Text;
-            _message = new Poker.Shared.Message(this.txtWriter.Text, MessageType.PlayerJoiningGame);
-        }
-
-        private void btnLeaveGame_Click(object sender, EventArgs e)
-        {
-            this.txtWriter.Text = "PlayerLeavingGame:" + this.txtUsername.Text;
-            _message = new Poker.Shared.Message(this.txtWriter.Text, MessageType.PlayerLeavingGame);
-        }
-        
-
-        private void btnAction_Click(object sender, EventArgs e)
-        {
-            this.txtWriter.Text = "PlayerAction:" + this.txtUsername.Text;
-            _message = new Poker.Shared.Message(this.txtWriter.Text, MessageType.PlayerAction);
-            _message.Callback += new AsyncCallback(ActionCallBack);
-        }
-        private void ActionCallBack(IAsyncResult result)
-        {
-            Poker.Shared.Message message = (Poker.Shared.Message)result;
-          //  this.txtReceiever.AppendText(message.Content + Environment.NewLine);
-            AppendTextBox(this.txtReceiever, message);
-        }
+       
+     
 
         private void btnCasino_Click(object sender, EventArgs e)
         {
@@ -206,6 +185,19 @@ namespace PokerClient
         private void TestPlayer_Paint(object sender, PaintEventArgs e)
         {
            
+        }
+
+        private void txtWriter_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TestPlayer_Resize(object sender, EventArgs e)
+        {
+            this.panel1.Location = new Point(0, 80);
+            this.panel1.Size = new Size(this.Width, this.Height - 80);
+            //this._casinoView.Location = new Point(0, 80);
+            //this._casinoView.Size = new Size(this.Width, this.Height - 80);
         }
     }
 }

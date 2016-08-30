@@ -81,6 +81,7 @@ namespace PokerClient
                         {
                             sw.WriteLine(message.Serialize());
                             sw.Flush();
+                            Console.WriteLine("Flushed: " + message.MessageType);
                         }
                         catch (System.IO.IOException e)
                         {

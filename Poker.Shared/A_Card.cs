@@ -15,6 +15,11 @@ namespace Poker.Shared
             Rank = r;
             Suit = s;
         }
+        public A_Card()
+        {
+            Rank = Rank.Blank;
+            Suit = Suit.Blank;
+        }
         public Suit Suit
         {
             get;
@@ -24,6 +29,12 @@ namespace Poker.Shared
         {
             get;
             protected set;
+        }
+        public bool IsCardBlank()
+        {
+            if ((Suit == Suit.Blank) || (Rank == Rank.Blank))
+                return true;
+            return false;
         }
         public string Serialize()
         {
@@ -36,7 +47,8 @@ namespace Poker.Shared
         Spade,
         Heart,
         Club,
-        Diamond
+        Diamond,
+        Blank
     }
     public enum Rank
     {
@@ -52,6 +64,7 @@ namespace Poker.Shared
         Ten,
         Jack,
         Queen,
-        King
+        King,
+        Blank
     }
 }

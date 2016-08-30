@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,15 @@ namespace Poker.Client.Support
         {
             get; set;
         }
+        public Bitmap HoleCard_1
+        {
+            get;set;
+        }
+        public Bitmap HoleCard_2
+        {
+            get;set;
+        }
+
         public bool Joined
         {
             get;set;

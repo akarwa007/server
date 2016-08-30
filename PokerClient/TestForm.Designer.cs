@@ -91,6 +91,7 @@
             this.Text = "Add Poker User";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TestForm_FormClosing);
             this.Load += new System.EventHandler(this.TestForm_Load);
+            this.Resize += new System.EventHandler(this.TestForm_Resize);
             this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);
 
