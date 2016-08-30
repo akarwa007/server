@@ -16,6 +16,7 @@ namespace Poker.Server
     {
         readonly object lockIncoming = new object();
         readonly object lockOutgoing = new object();
+        // readonly object lockConsumeIncoming = new object();
 
         Queue<Message> queueIncoming = new Queue<Message>();
         Queue<Message> queueOutgoing = new Queue<Message>();
@@ -26,14 +27,11 @@ namespace Poker.Server
         PokerUser _pokerUser;
         Thread ProduceIncomingThread;
         Thread ConsumeIncomingThread;
-        Thread ProduceOutgoingThread;
         Thread ConsumeOutgoingThread;
 
         public RecieveMessageDelegate ReceieveMessageHandler = null; // probably needs a property
         
-        
-
-        private Action<String> _funcStream;
+        //private Action<String> _funcStream;
         public ProducerConsumer(TcpClient client, PokerUser user)
         {
             _client = client;
@@ -82,7 +80,8 @@ namespace Poker.Server
                         {
                             sw.WriteLine(message.Serialize());
                             sw.Flush();
-                            Console.WriteLine(message.MessageType + ": sent to " + this._pokerUser.UserName);
+                            //Console.WriteLine(message.MessageType + ": sent to " + this._pokerUser.UserName);
+                            log(message);
                         }
                         catch (System.IO.IOException e)
                         {
@@ -213,6 +212,13 @@ namespace Poker.Server
                 }
                 return queueOutgoing.Dequeue();
             }
+        }
+        private void log(Message message)
+        {
+            if (message.MessageType == MessageType.PlayerActionRequestBet)
+                Console.WriteLine(message.MessageType + "--" + this._pokerUser.UserName + "--" + message.Content);
+            else
+                Console.WriteLine(message.MessageType + " sent to" + this._pokerUser.UserName);
         }
     }
 }

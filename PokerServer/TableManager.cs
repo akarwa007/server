@@ -45,16 +45,16 @@ namespace Poker.Server
         }
         public void CreateTable(short capacity)
         {
-            Table t = new Table(10, "TexasHodldem", "NoLimit", "2-5", 200, 500,MessageFactory.SendTableUpdateMessage);
+            Table t = new Table(10, "Texas Holdem", "No Limit", "2-5", 200, 500,MessageFactory.SendTableUpdateMessage);
            _tables.Add(t);
-            //_tables.Add(new Table(10, "TexasHodldem", "NoLimit", "2-5", 200, 500));
-            _tables.Add(new Table(10, "TexasHodldem", "Limit", "1-2", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "TexasHodldem", "Limit", "3-6", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "TexasHodldem", "Limit", "4-8", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "Omaha", "HiLow", "1-2", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "Omaha", "HiLow", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "Omaha", "HiLow", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
-            _tables.Add(new Table(10, "Omaha", "HiLow", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
+            
+            _tables.Add(new Table(10, "Texas Holdem", "Limit", "1-2", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Texas Holdem", "Limit", "3-6", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Texas Holdem", "Limit", "4-8", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Omaha", "Hi Low", "1-2", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Omaha", "Hi Low", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Omaha", "Hi Low", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
+            _tables.Add(new Table(10, "Omaha", "Hi Low", "2-5", 200, 500, MessageFactory.SendTableUpdateMessage));
         }
        public  IEnumerable<ITable> GetRunningTables()
         {

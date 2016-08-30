@@ -66,6 +66,7 @@
     <Compile Include="Card.cs" />
     <Compile Include="ClientConnections.cs" />
     <Compile Include="ClientPlayerManager.cs" />
+    <Compile Include="ClientView\CardView.cs" />
     <Compile Include="ClientView\CasinoView.cs" />
     <Compile Include="ClientView\SeatView.cs" />
     <Compile Include="ClientView\TableView.cs" />

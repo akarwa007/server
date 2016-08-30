@@ -57,8 +57,11 @@ namespace Poker.Server
                 Player player = _table.GetNextPlayer();
                 if (player.InHand)
                 {
-                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
-                   
+                    lock (_table.SynchronizeGame)
+                    {
+                        MessageFactory.RequestAction(_table, player, "preflop");
+                        Monitor.Wait(_table.SynchronizeGame,20000);                    
+                    }                  
                 }
                 playercount--;
             }
@@ -75,10 +78,13 @@ namespace Poker.Server
            {
                Player player = _table.GetNextPlayer();
                if (player.InHand)
-               {
-                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
-
-               }
+                { 
+                    lock (_table.SynchronizeGame)
+                    {
+                        MessageFactory.RequestAction(_table, player, "postflop");
+                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                    }
+                }
                playercount--;
            }
             //deal the turn 
@@ -94,9 +100,12 @@ namespace Poker.Server
                Player player = _table.GetNextPlayer();
                if (player.InHand)
                {
-                   MessageFactory.RequestAction(player); // this connects to client and waits for response.
-
-               }
+                    lock (_table.SynchronizeGame)
+                    {
+                        MessageFactory.RequestAction(_table, player, "postturn");
+                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                    }
+                }
                playercount--;
            }
 
@@ -113,9 +122,12 @@ namespace Poker.Server
                Player player = _table.GetNextPlayer();
                if (player.InHand)
                {
-                    MessageFactory.RequestAction(player); // this connects to client and waits for response.
-
-               }
+                    lock (_table.SynchronizeGame)
+                    {
+                        MessageFactory.RequestAction(_table, player, "postriver");
+                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                    }
+                }
                playercount--;
            }
            // announce the winner

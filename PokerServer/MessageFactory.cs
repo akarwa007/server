@@ -31,10 +31,12 @@ namespace Poker.Server
                 user.SendMessage(m);
             }
         }
-        public static void RequestAction(Player p)
+        public static void RequestAction(Table t, Player p, string comment)
         {
             // this will wait with the client player and seek an action 
-
+            Message m = new Message("RequestBet", MessageType.PlayerActionRequestBet);
+            m.Content = t.TableNo + ":" + comment; // Add more elements like min and max bet size etc later
+            SendMessageToPlayer(p, m);
 
         }
         public static void SendMessageToPlayer(Player p, Message m)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Net.Sockets;
 using Poker.Shared;
 using Poker.Common;
@@ -12,6 +13,7 @@ namespace Poker.Server
     
     public class PokerUser
     {
+        private object lock_for_ProcessIncomingMessage = new object();
         ProducerConsumer _producerconsumer;
         Action<Message> _incomingmessage_callback;
         public PokerUser()
@@ -56,28 +58,53 @@ namespace Poker.Server
         }
         private void ProcessIncomingMessage(Message m)
         {
-            if (m != null)
+            //lock (lock_for_ProcessIncomingMessage)
+            Task.Run(() =>
             {
-                Console.WriteLine("Inside ProcessinomingMessage " + m.Content);
-                if (m.MessageType == MessageType.PlayerSigningIn)
+                if (m != null)
                 {
-                    string[] arr = m.Content.Split(':');
-                    UserName = arr[0];
-                    MessageFactory.SendCasinoMessage(this);
-                }
-                if (m.MessageType == MessageType.PlayerJoiningGame)
-                {
-                    string[] arr = m.Content.Split(':');
-                    string tableNo = arr[0];
-                    short seatNo = Convert.ToInt16(arr[1]);
-                    decimal chipCount = Convert.ToDecimal(arr[2]);
-                    Table t = TableManager.Instance.GetTable(tableNo);
-                    if (chipCount >= 0)
-                        t.AddPlayer(new Player(this,t), seatNo);
-                    else
-                        t.RemovePlayerEx(seatNo);
+                    Console.WriteLine("Inside ProcessinomingMessage " + m.Content);
+                    if (m.MessageType == MessageType.PlayerSigningIn)
+                    {
+                        string[] arr = m.Content.Split(':');
+                        UserName = arr[0];
+                        MessageFactory.SendCasinoMessage(this);
+                    }
+                    if (m.MessageType == MessageType.PlayerJoiningGame)
+                    {
+                        string[] arr = m.Content.Split(':');
+                        string tableNo = arr[0];
+                        short seatNo = Convert.ToInt16(arr[1]);
+                        decimal chipCount = Convert.ToDecimal(arr[2]);
+                        Table t = TableManager.Instance.GetTable(tableNo);
+                        if (chipCount >= 0)
+                            t.AddPlayer(new Player(this, t), seatNo);
+                        else
+                            t.RemovePlayerEx(seatNo);
+                    }
+                    if (m.MessageType == MessageType.PlayerAction)
+                    {
+                        string[] arr = m.Content.Split(':');
+                        string tableNo = arr[0];
+                        decimal betsize = Convert.ToDecimal(arr[1]);
+
+                        Table t = TableManager.Instance.GetTable(tableNo);
+                        // set the wait to the receieve action for the player
+                        lock(t.SynchronizeGame)
+                        {
+                            if (betsize < 0)
+                            {
+                                // player wants to fold the hand.
+                                Player p = t.GetPlayer(this);
+                                p.FoldHand();
+                            }
+                            Monitor.PulseAll(t.SynchronizeGame);
+                        }
+                        Console.WriteLine("Received Bet from player " + this.UserName + " for size = " + betsize);
+                    }
                 }
             }
+           );
         }
         public void SendMessage(Message m)
         {

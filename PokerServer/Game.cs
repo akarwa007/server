@@ -10,10 +10,10 @@ namespace Poker.Server
     {
         private Deck _deck;
       
-        private Tuple<Card, Card, Card> _flop = null;
-        private Card _turn = null;
-        private Card _river = null;
-        private Tuple<Card, Card, Card, Card, Card> _board = null;
+        private Tuple<Card, Card, Card> _flop = new Tuple<Card, Card, Card>(new Card(), new Card(), new Card());
+        private Card _turn = new Card();
+        private Card _river = new Card();
+        private Tuple<Card, Card, Card, Card, Card> _board = new Tuple<Card, Card, Card, Card, Card>(new Card(), new Card(), new Card(), new Card(), new Card());
         private decimal _minStartingChipsPerPlayer;
         private decimal _maxStartingChipsPerPlayer;
         private decimal _potSize = 0;
@@ -40,7 +40,7 @@ namespace Poker.Server
         }
         public Tuple<Card, Card, Card> GetFlop()
         {
-            if (_flop == null)
+            if (_flop.Item1.IsCardBlank())
             { 
             // burn a card
             Card burn = _deck.GetNext();
@@ -57,7 +57,7 @@ namespace Poker.Server
 
         public Card GetTurn()
         {
-            if (_turn == null)
+            if (_turn.IsCardBlank())
             {
                 Card burn = _deck.GetNext();
                _turn = _deck.GetNext();
@@ -67,7 +67,7 @@ namespace Poker.Server
         }
         public Card GetRiver()
         {
-            if (_river == null)
+            if (_river.IsCardBlank())
             {
                 Card burn = _deck.GetNext();
                 _river = _deck.GetNext();
@@ -80,6 +80,30 @@ namespace Poker.Server
         {
             // error checking , cannot call board until the river had been dealt.
             return _board;
+        }
+        public Tuple<Card,Card,Card> Flop
+        {
+            get
+            {
+                return _flop;
+            }
+           
+        }
+        public Card Turn
+        {
+            get
+            {
+                return _turn;
+            }
+
+        }
+        public Card River
+        {
+            get
+            {
+                return _river;
+            }
+
         }
         public decimal AddToPot(decimal amount)
         {

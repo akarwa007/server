@@ -25,8 +25,12 @@ namespace Poker.Server
             short index = 0;
             foreach (Suit s in Enum.GetValues(typeof(Suit)))              
             {
+                if (s == Suit.Blank)
+                    continue;
                 foreach (Rank r in Enum.GetValues(typeof(Rank)))
                 {
+                    if (r == Rank.Blank)
+                        continue;
                     _cards[index++] = new Card(s, r);
                 }
             }

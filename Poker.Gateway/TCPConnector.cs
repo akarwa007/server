@@ -16,6 +16,7 @@ namespace Poker.Gateway
     {
         private bool listen = true;
         TcpListener listener = null;
+        private object  lock_for_pokerusercreaion = new object();
 
         private MessageProcessor _MP = new MessageProcessor();
         
@@ -67,9 +68,12 @@ namespace Poker.Gateway
         private void forknewthread(TcpClient client)
         {
             _funcStream(new Message("Incoming new client request", MessageType.GeneralPurpose));
-         
+
             //create a pokeruser 
-            _callback_createpokeruser(client,_funcStream, "", "");
+            lock (lock_for_pokerusercreaion)
+            {
+                _callback_createpokeruser(client, _funcStream, "", "");
+            }
         }
         
     }

@@ -18,6 +18,10 @@ namespace Poker.Server
             this.Rank = r;
             
         }
+        public Card():base()
+        {
+            
+        }
        
     }
    

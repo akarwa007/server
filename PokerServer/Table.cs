@@ -12,6 +12,7 @@ namespace Poker.Server
     public class Table : ITable
     {
 
+        public object SynchronizeGame = new object();
         private short _capacity = 9;
         private Dictionary<Seat, Player> _seats;
         private Seat[] _Seats;
@@ -24,7 +25,7 @@ namespace Poker.Server
         private GameManager _gameManager;
         public static int TableNumber = 1;
         
-        private int _currentPosition = 1; // seat numbers start with 1
+        private int _currentPosition = 0; // seat numbers start with 1
         public event Action<Table> TableUpdatedEvent;
         public Table(short capacity , string gamename, string gamesubname , string gamevalue, decimal minchips , decimal maxchips, Action<Table> tableUpdateEventHandler)
         {
@@ -44,7 +45,23 @@ namespace Poker.Server
         }
         private void RaiseEvent()
         {
-            TableUpdatedEvent?.Invoke(this);
+           // TableUpdatedEvent?.Invoke(this);
+            Delegate[] arr = TableUpdatedEvent.GetInvocationList();
+            if (arr[0].Method.Name == "SendTableUpdateMessage")
+            {
+                arr[0].DynamicInvoke(this);
+                arr[1].DynamicInvoke(this);
+            }
+            else
+            {
+                arr[1].DynamicInvoke(this);
+                arr[0].DynamicInvoke(this);
+            }
+
+
+           
+
+
         }
         private void initialize()
         {
@@ -73,7 +90,7 @@ namespace Poker.Server
                     _seats[seat] = p;
                     break;
                 }
-            }
+            }   
             RaiseEvent();
         }
         private bool IsPlayerSeated(Player p)
@@ -218,24 +235,57 @@ namespace Poker.Server
                 _tableNo = value;
             }
         }
+      
+        public Tuple<Card, Card, Card> Flop
+        {
+            get
+            {
+                return _game.Flop;
+            }
+
+        }
+        public Card Turn
+        {
+            get
+            {
+                return _game.Turn;
+            }
+
+        }
+        public Card River
+        {
+            get
+            {
+                return _game.River;
+            }
+
+        }
         public int PlayerCount()
         {
             return _seats.Where(a => a.Key.IsEmpty() == false).Count();
+        }
+        public Player GetPlayer(PokerUser user)
+        {
+            var listOfPlayers = _seats.Values;
+            var found = listOfPlayers.Where(x => x.UserName == user.UserName);
+            if ((found == null) || (found.Count() == 0))
+                return null;
+            return found.FirstOrDefault();
         }
         public Player GetNextPlayer() // keeps serving players in a round robin fashion. 
         {
            int fullseatcount = _seats.Count();
            if (fullseatcount < 2)
                throw new Exception("No game possible with less than 2 players seated on a table");
-           Seat nextseat = _seats.Where(a => a.Key.SeatNumber == this._currentPosition).FirstOrDefault().Key;
+           Seat nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
 
            while (nextseat.IsEmpty())
            {
               this._currentPosition = ( this._currentPosition + 1) % fullseatcount;
-              nextseat = _seats.Where(a => a.Key.SeatNumber == this._currentPosition).FirstOrDefault().Key;
+              nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
            }
-            
-           return _seats[nextseat];
+            this._currentPosition = (this._currentPosition + 1) % fullseatcount;
+            return _seats[nextseat];
         }
         public void ResetToSmallBlind()
         {
