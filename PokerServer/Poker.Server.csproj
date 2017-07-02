@@ -78,6 +78,7 @@
     <Compile Include="MessageFactory.cs" />
     <Compile Include="MessageProcessor.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerBankingService.cs" />
     <Compile Include="PokerUserConnection.cs" />
     <Compile Include="PlayerFactory.cs" />
     <Compile Include="PokerUser.cs" />

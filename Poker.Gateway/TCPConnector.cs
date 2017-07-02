@@ -49,7 +49,7 @@ namespace Poker.Gateway
       
         private void startasync()
         {
-            System.Net.IPAddress ipAddress = System.Net.IPAddress.Parse("127.0.0.1");
+            System.Net.IPAddress ipAddress = System.Net.IPAddress.Parse("0.0.0.0");
             listener = new TcpListener(ipAddress,8113);
             listener.Start(100);
             _funcStream(new Message("Server Started Successfully",MessageType.GeneralPurpose));

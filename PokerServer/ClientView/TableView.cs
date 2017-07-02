@@ -23,6 +23,7 @@ namespace Poker.Server.ClientView
             GameName = table.GameName;
             GameValue = table.GameValue;
             TableNo = table.TableNo;
+            DealerPosition = table.DealerPosition;
             foreach (var x in table.Seats)
             {
                 //Tuple<short, string, decimal> t = new Tuple<short, string, decimal>(x.Key.SeatNumber,  x.Value.UserName, x.Value.ChipCount);

@@ -37,6 +37,7 @@ namespace Poker.Server
             _producerconsumer = new ProducerConsumer(TcpClient, this);
             RegisterForIncomingMessages(new RecieveMessageDelegate(ProcessIncomingMessage));
             RegisterForIncomingMessages(new RecieveMessageDelegate(_incomingmessage_callback));
+			SendMessage(new Message("ServerReady",MessageType.ServerReady));
            
         }
         internal TcpClient TcpClient
@@ -69,6 +70,8 @@ namespace Poker.Server
                         string[] arr = m.Content.Split(':');
                         UserName = arr[0];
                         MessageFactory.SendCasinoMessage(this);
+                        // Also send the Player Bank Balance
+                        MessageFactory.SendPlayerBankBalanceMessage(this);
                     }
                     if (m.MessageType == MessageType.PlayerJoiningGame)
                     {
@@ -78,7 +81,7 @@ namespace Poker.Server
                         decimal chipCount = Convert.ToDecimal(arr[2]);
                         Table t = TableManager.Instance.GetTable(tableNo);
                         if (chipCount >= 0)
-                            t.AddPlayer(new Player(this, t), seatNo);
+                            t.AddPlayer(new Player(this, t,chipCount), seatNo);
                         else
                             t.RemovePlayerEx(seatNo);
                     }

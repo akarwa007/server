@@ -172,5 +172,48 @@ namespace Poker.Server
         {
 
         }
+
+        private void btnViewTables_Click(object sender, EventArgs e)
+        {
+            // list the poker clients connected to the server
+            // will have ability to disconnect a client too. 
+            dataGridView_Tables.Rows.Clear();
+            dataGridView_Tables.Columns.Clear();
+            dataGridView_Tables.Columns.Add("TableNo", "TableNo");
+            dataGridView_Tables.Columns.Add("PlayerCount", "PlayerCount");
+            dataGridView_Tables.Columns.Add("StartGame", "StartGame");
+            IEnumerable<ITable> tables = TableManager.Instance.GetRunningTables();
+            int rowindex = 0;
+            foreach (ITable table in tables)
+            {
+                Table t = (Table)table;
+              
+                dataGridView_Tables.Rows.Add(new object[] { t.TableNo, t.PlayerCount() ,"Start"});
+                Button bt = new Button();
+                bt.Text = "Start the Game";
+                //dataGridView_Tables.Controls.Add(bt);
+                //bt.Location = this.dataGridView_Tables.GetCellDisplayRectangle(2,rowindex, true).Location;
+                //bt.Size = this.dataGridView_Tables.GetCellDisplayRectangle(2,rowindex, true).Size;
+
+                DataGridViewButtonCell buttonCell = new DataGridViewButtonCell();
+                
+                this.dataGridView_Tables[2,rowindex] = buttonCell;
+                this.dataGridView_Tables[2,rowindex].Value = "Start the Game";
+
+
+                rowindex++;
+            }
+        }
+
+        private void dataGridView_Tables_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            string s = "";
+            if (e.ColumnIndex == 2)
+            {
+                string tableno = dataGridView_Tables[0, e.RowIndex].Value.ToString();
+                TableManager.Instance.GetTable(tableno).StartStopGame();
+            }
+
+        }
     }
 }

@@ -14,6 +14,13 @@ namespace Poker.Server.ClientView
             TableNo = seat.TableNo;
             ChipCounts = seat.ChipCounts;
             UserName = seat.UserName;
+            Joined = seat.UserName != "Empty";
+            IsDealer = seat.IsDealer;
+        }
+     
+        public bool Joined
+        {
+            get;set;
         }
         public short SeatNo
         {
@@ -30,6 +37,10 @@ namespace Poker.Server.ClientView
         public string UserName
         {
             get; set;
+        }
+        public bool IsDealer
+        {
+            get;set;
         }
     }
 }

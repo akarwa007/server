@@ -136,8 +136,7 @@ namespace Poker.Server
             {
                 Message m = ConsumeIncoming();
                 m.UserName = this._pokerUser.UserName;
-                Console.WriteLine("inside func_consumeincoming " + m.Content);
-                Console.WriteLine("username is  " + m.UserName);
+             
                 // fire all callbacks waiting on these messages.
                 if (ReceieveMessageHandler != null)
                 {

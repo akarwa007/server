@@ -41,14 +41,14 @@ namespace Poker.Server
         public Player RemovePlayer()
         {
             Player removed = _player;
-            _player = new Player(null,_table);
+            _player = new Player(null,_table,0);
             return removed;
         }
         public bool RemovePlayer(Player p)
         {
             if (_player == p)
             {
-                _player = new Player(null, _table); ;
+                _player = new Player(null, _table,0); ;
                 return true;
             }
             throw new Exception("Trying to remove a player not seated on the seat");
@@ -65,6 +65,10 @@ namespace Poker.Server
         public bool IsEmpty()
         {
             return (_player.UserName == "Empty");
+        }
+        public bool IsDealer
+        {
+            get;set;
         }
     
     }

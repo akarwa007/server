@@ -11,7 +11,6 @@ namespace Poker.Server
 {
     public class Table : ITable
     {
-
         public object SynchronizeGame = new object();
         private short _capacity = 9;
         private Dictionary<Seat, Player> _seats;
@@ -57,18 +56,13 @@ namespace Poker.Server
                 arr[1].DynamicInvoke(this);
                 arr[0].DynamicInvoke(this);
             }
-
-
-           
-
-
         }
         private void initialize()
         {
             _seats = new Dictionary<Seat, Player>();
             short count = this._capacity;
             short seatno = 1;
-            Player empty = new Player(null,this);
+            Player empty = new Player(null,this,0);
             while (count > 0)
             {
                 Seat s = new Seat(empty, this, seatno);
@@ -77,7 +71,6 @@ namespace Poker.Server
                 count--;
                 seatno++;
             }
-
         }
         public void AddPlayer(Player p)
         {
@@ -118,7 +111,7 @@ namespace Poker.Server
         public Player RemovePlayer(short seatNo)
         {
             Player removed = _Seats[seatNo].RemovePlayer();
-            _seats[_Seats[seatNo]] = new Player(null, this); ;
+            _seats[_Seats[seatNo]] = new Player(null, this,0); ;
             return removed;
         }
         public void RemovePlayerEx(short seatNo)
@@ -132,7 +125,6 @@ namespace Poker.Server
             RemovePlayer(p);
             RemovedPlayer = p;
             RaiseEvent();
-
         }
         public void RemovePlayer(Player p)
         {
@@ -141,13 +133,12 @@ namespace Poker.Server
             {
                 if (_seats[seat] == p)
                 {
-                    _seats[seat] = new Player(null,this);
+                    _seats[seat] = new Player(null,this,0);
                     seat.RemovePlayer(p);
                     //RemovedPlayer = p;
                     break;
                 }
             }
-           
         }
         public Player RemovedPlayer
         {
@@ -164,31 +155,48 @@ namespace Poker.Server
                 _seats = value;
             }
         }
+        private int GetPlayerSeatNo(Player p)
+        {
+            int seatno = 0;
+            var x = this._seats.Where(a => a.Value == p).FirstOrDefault();
+            seatno = x.Key.SeatNumber;
+            return seatno;
+        }
+        public void SetDealerPosition()
+        {
+            //get the next seated player from seat 1 onwards, and make him the dealer
+            Player p = GetNextPlayer();
+            if (p != null)
+                this.DealerPosition = GetPlayerSeatNo(p);
+                
+        }
+        public void AdvanceDealerPosition()
+        {
+            //int fullseatcount = _seats.Count();
+            //this._currentPosition = (this._currentPosition + 1) % fullseatcount;
+            SetDealerPosition();
+
+        }
         public int DealerPosition
         {
             get { return _dealerPosition; }
             set
             {
-                int fullseatcount = _seats.Count();
+                _dealerPosition = value;
+                foreach( Seat key in _seats.Keys)
+                {
+                    key.IsDealer = false;
+                }
 
-                _dealerPosition = value % fullseatcount;
-                _currentPosition = (_dealerPosition + 1) % fullseatcount;
+                var seat = _seats.Where(x => x.Key.SeatNumber == _dealerPosition).FirstOrDefault();
+                seat.Key.IsDealer = true;
             }
         }
-        public int SmallBlind_Position
+        public string GameState
         {
             get
             {
-                int fullseatcount = _seats.Count();
-                return (_dealerPosition + 1) % fullseatcount;
-            }
-        }
-        public int BigBlind_Position
-        {
-            get
-            {
-                int fullseatcount = _seats.Count();
-                return (_dealerPosition + 2) % fullseatcount;
+                return _game.GameState();
             }
         }
         public string GameName
@@ -235,14 +243,12 @@ namespace Poker.Server
                 _tableNo = value;
             }
         }
-      
         public Tuple<Card, Card, Card> Flop
         {
             get
             {
                 return _game.Flop;
             }
-
         }
         public Card Turn
         {
@@ -250,7 +256,6 @@ namespace Poker.Server
             {
                 return _game.Turn;
             }
-
         }
         public Card River
         {
@@ -258,7 +263,13 @@ namespace Poker.Server
             {
                 return _game.River;
             }
-
+        }
+        public void ResetForGameStart()
+        {
+            foreach(var player in _seats.Values)
+            {
+                player.ResetForGameStart();
+            }
         }
         public int PlayerCount()
         {
@@ -279,7 +290,7 @@ namespace Poker.Server
                throw new Exception("No game possible with less than 2 players seated on a table");
            Seat nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
 
-           while (nextseat.IsEmpty())
+           while (nextseat.IsEmpty()) 
            {
               this._currentPosition = ( this._currentPosition + 1) % fullseatcount;
               nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
@@ -289,19 +300,26 @@ namespace Poker.Server
         }
         public void ResetToSmallBlind()
         {
-             this._currentPosition = SmallBlind_Position;
+            this._currentPosition = this.DealerPosition;
         }
-      
-    }
+        public void ResetToUTG()
+        {
+            //this._currentPosition = SmallBlind_Position;
+            ResetToSmallBlind();
+            var x = this.GetNextPlayer(); // got small blind
+            x = this.GetNextPlayer(); // got big blind , currentposition set to UTG
 
+        }
+        public void StartStopGame()
+        {
+            _gameManager.StartStopAsync();
+        }
+    }
     public interface ITable
     {
         void AddPlayer(Player p);
         void RemovePlayer(Player p);
         int PlayerCount();
-       
-
-
     }
 
 }

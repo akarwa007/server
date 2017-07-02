@@ -15,12 +15,14 @@ namespace Poker.Server
         private decimal _chipcount = 0;
         private Tuple<Card, Card> _holecards;
         private bool _playerStillInHand = false;
+        private bool _playerplayedingame = false;
         private Table _table;
         private PokerUser _pokeruser;
         public event Action<Player,Poker.Shared.Message> PlayerAction;
-        public Player(PokerUser pokeruser, Table table)
+        public Player(PokerUser pokeruser, Table table, decimal chipCount)
         {
             _table = table;
+            _chipcount = chipCount;
             _pokeruser = pokeruser;
             initialize();
         }
@@ -59,10 +61,26 @@ namespace Poker.Server
         {
             PlayerAction?.Invoke(this, message);
         }
+        public void ResetForGameStart()
+        {
+            _holecards = null;
+            _playerStillInHand = false;
+
+        }
+        public void AssignDealerButton(int seatno)
+        {
+          
+            Message message = new Message("DealerButtonPosition", MessageType.DealerButtonPosition);
+            message.Content = _table.TableNo + ":";
+            message.Content +=  seatno;
+
+            RaiseEvent(message);
+        }
         public void AssignHoleCards(Tuple<Card,Card> holecards)
         {
             _holecards = holecards;
             _playerStillInHand = true;
+            _playerplayedingame = true;
             //Create the PlayerActionAssignHoleCards message
             Message message = new Message("HoleCards", MessageType.TableSendHoleCards);
             message.Content = _table.TableNo + ":";

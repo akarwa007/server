@@ -13,6 +13,7 @@ namespace Poker.Server
         private Game _game;
         private Table _table;
         private bool _GameInPogress = false;
+        private bool _GameStopFlag = false;
        
         
         public GameManager(Game game, Table table)
@@ -30,108 +31,145 @@ namespace Poker.Server
 
         private void _table_TableUpdatedEvent(Table table)
         {
-            if ((table.PlayerCount() >= 3) && (!_GameInPogress))
-                Start();
+            Start();
         }
-
-        public void Start()
+        public void StartStopAsync()
         {
+            Task.Run(() =>
+            {
+                if (!_GameStopFlag)
+                    Stop();
+                else
+                    Start();
+            });
+        }
+        public void Stop()
+        {
+            _GameStopFlag = true;
+        }
+        private void Start()
+        {
+            if (!((_table.PlayerCount() >= 4) && (!_GameInPogress)))
+                return;
+               
             if ((_game == null) || (_table == null))
                 throw new Exception("Table or Game cannot be null");
             _GameInPogress = true;
-            _table.DealerPosition = 1;
+            _GameStopFlag = false;
+
+            _table.SetDealerPosition();
             //deal hole cards to seated players
             int playercount = _table.PlayerCount();
+            int gamecount = 10;
+            int timespan = 8000; // 10 secs
+            while ((gamecount > 0) && (!_GameStopFlag)) // game loop
+            {
+                gamecount--;
+                _game.initialize();
+                _table.ResetForGameStart();
+               
+                // initialize the player , resetting the folded hand state
+                // Also consolidate who all players are in the game. Anybody who is not dealt a hole card should not be asked for betting
 
-            while (playercount > 0)
-            {
-                Player player = _table.GetNextPlayer();
-                player.AssignHoleCards( _game.DealPlayerHand());
-                playercount--;
-            }
-            // do bet collecting round 
-            _table.ResetToSmallBlind();
-            playercount = _table.PlayerCount();
-            while (playercount > 0)
-            {
-                Player player = _table.GetNextPlayer();
-                if (player.InHand)
+                _game.SetGameState("Starting");
+                MessageFactory.SendGameUpdateMessage(_table); // this is sent to reset the board and holecards of the clients
+                MessageFactory.SendTableUpdateMessage(_table);
+                Thread.Sleep(5000); // deliberately delay to give client time to process.
+                playercount = _table.PlayerCount();
+                while (playercount > 0)
                 {
-                    lock (_table.SynchronizeGame)
-                    {
-                        MessageFactory.RequestAction(_table, player, "preflop");
-                        Monitor.Wait(_table.SynchronizeGame,20000);                    
-                    }                  
+                    Player player = _table.GetNextPlayer();
+                    player.AssignDealerButton(0);
+                    player.AssignHoleCards(_game.DealPlayerHand());
+                    playercount--;
                 }
-                playercount--;
-            }
-
-            // deal the flop 
-           Tuple<Card,Card,Card> flop =  _game.GetFlop();
-           MessageFactory.SendFlop(_table, flop);
-
-            // do bet collecting round
-
-           _table.ResetToSmallBlind();
-           playercount = _table.PlayerCount();
-           while (playercount > 0)
-           {
-               Player player = _table.GetNextPlayer();
-               if (player.InHand)
-                { 
-                    lock (_table.SynchronizeGame)
+                // do bet collecting round 
+                _table.ResetToUTG();
+                playercount = _table.PlayerCount();
+                while (playercount > 0)
+                {
+                    Player player = _table.GetNextPlayer();
+                    if (player.InHand)
                     {
-                        MessageFactory.RequestAction(_table, player, "postflop");
-                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                        lock (_table.SynchronizeGame)
+                        {
+                            MessageFactory.RequestAction(_table, player, "preflop");
+                            Monitor.Wait(_table.SynchronizeGame, timespan);
+                        }
                     }
+                    playercount--;
                 }
-               playercount--;
-           }
-            //deal the turn 
-           Card turn = _game.GetTurn();
-            MessageFactory.SendTurn(_table, turn);
 
-            // do bet collecting round
+                // deal the flop 
+                Tuple<Card, Card, Card> flop = _game.GetFlop();
+                MessageFactory.SendFlop(_table, flop);
 
-           _table.ResetToSmallBlind();
-           playercount = _table.PlayerCount();
-           while (playercount > 0)
-           {
-               Player player = _table.GetNextPlayer();
-               if (player.InHand)
-               {
-                    lock (_table.SynchronizeGame)
+                // do bet collecting round
+
+                _table.ResetToSmallBlind();
+                playercount = _table.PlayerCount();
+                while (playercount > 0)
+                {
+                    Player player = _table.GetNextPlayer();
+                    if (player.InHand)
                     {
-                        MessageFactory.RequestAction(_table, player, "postturn");
-                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                        lock (_table.SynchronizeGame)
+                        {
+                            MessageFactory.RequestAction(_table, player, "postflop");
+                            Monitor.Wait(_table.SynchronizeGame, timespan);
+                        }
                     }
+                    playercount--;
                 }
-               playercount--;
-           }
+                //deal the turn 
+                Card turn = _game.GetTurn();
+                MessageFactory.SendTurn(_table, turn);
 
-            // deal the river
-           Card river = _game.GetRiver();
-            MessageFactory.SendRiver(_table, river);
+                // do bet collecting round
 
-           // do the bet collecting round
-
-           _table.ResetToSmallBlind();
-           playercount = _table.PlayerCount();
-           while (playercount > 0)
-           {
-               Player player = _table.GetNextPlayer();
-               if (player.InHand)
-               {
-                    lock (_table.SynchronizeGame)
+                _table.ResetToSmallBlind();
+                playercount = _table.PlayerCount();
+                while (playercount > 0)
+                {
+                    Player player = _table.GetNextPlayer();
+                    if (player.InHand)
                     {
-                        MessageFactory.RequestAction(_table, player, "postriver");
-                        Monitor.Wait(_table.SynchronizeGame, 20000);
+                        lock (_table.SynchronizeGame)
+                        {
+                            MessageFactory.RequestAction(_table, player, "postturn");
+                            Monitor.Wait(_table.SynchronizeGame, timespan);
+                        }
                     }
+                    playercount--;
                 }
-               playercount--;
-           }
-           // announce the winner
 
+                // deal the river
+                Card river = _game.GetRiver();
+                MessageFactory.SendRiver(_table, river);
+
+                // do the bet collecting round
+
+                _table.ResetToSmallBlind();
+                playercount = _table.PlayerCount();
+                while (playercount > 0)
+                {
+                    Player player = _table.GetNextPlayer();
+                    if (player.InHand)
+                    {
+                        lock (_table.SynchronizeGame)
+                        {
+                            MessageFactory.RequestAction(_table, player, "postriver");
+                            Monitor.Wait(_table.SynchronizeGame, timespan);
+                        }
+                    }
+                    playercount--;
+                }
+                // announce the winner
+               _game.SetGameState("Ending");
+                MessageFactory.SendGameUpdateMessage(_table);
+                _GameInPogress = false;
+                _table.AdvanceDealerPosition();
+            }// end of game loop
         }
     }
 }

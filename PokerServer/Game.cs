@@ -10,13 +10,16 @@ namespace Poker.Server
     {
         private Deck _deck;
       
-        private Tuple<Card, Card, Card> _flop = new Tuple<Card, Card, Card>(new Card(), new Card(), new Card());
-        private Card _turn = new Card();
-        private Card _river = new Card();
-        private Tuple<Card, Card, Card, Card, Card> _board = new Tuple<Card, Card, Card, Card, Card>(new Card(), new Card(), new Card(), new Card(), new Card());
+        private Tuple<Card, Card, Card> _flop;
+        private Card _turn;
+        private Card _river;
+        private Tuple<Card, Card, Card, Card, Card> _board;
+        
         private decimal _minStartingChipsPerPlayer;
         private decimal _maxStartingChipsPerPlayer;
         private decimal _potSize = 0;
+
+        private string _gameState = "NotStarted"; // valid values "Starting" , "Ended" , "InProgress" , "NotStarted"
         public Game(decimal minChips, decimal maxChips)
         {
             if (minChips < 0)
@@ -25,9 +28,13 @@ namespace Poker.Server
             _maxStartingChipsPerPlayer = maxChips;
             initialize();
         }
-        private void initialize()
+        public void initialize()
         {
             _deck = Deck.GetShuffledDeck();
+            _board = new Tuple<Card, Card, Card, Card, Card>(new Card(), new Card(), new Card(), new Card(), new Card());
+            _flop = new Tuple<Card, Card, Card>(new Card(), new Card(), new Card());
+            _turn = new Card();
+            _river = new Card();
         }
         public   Tuple<Card,Card> DealPlayerHand()
         {
@@ -80,6 +87,14 @@ namespace Poker.Server
         {
             // error checking , cannot call board until the river had been dealt.
             return _board;
+        }
+        public string GameState()
+        {
+            return _gameState;
+        }
+        public void SetGameState(string state)
+        {
+            _gameState = state;
         }
         public Tuple<Card,Card,Card> Flop
         {

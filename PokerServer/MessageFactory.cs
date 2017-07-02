@@ -31,12 +31,33 @@ namespace Poker.Server
                 user.SendMessage(m);
             }
         }
+		public static void SendServerReadyMessage(PokerUser user)
+		{
+			Poker.Shared.Message m = new Shared.Message("ServerReady", MessageType.ServerReady);
+			m.Content = "ServerReady";
+			if ((user != null) && (user.TcpClient != null) && (user.TcpClient.Connected))
+			{
+				user.SendMessage(m);
+			}
+		}
+		public static void SendPlayerBankBalanceMessage(PokerUser user)
+        {
+            Poker.Shared.Message m = new Shared.Message("PlayerBankBalance", MessageType.PlayerBankBalance);
+            m.Content = PlayerBankingService.Instance().GetBankBalance(user.UserName).ToString();
+            if ((user != null) && (user.TcpClient != null) && (user.TcpClient.Connected))
+            {
+                user.SendMessage(m);
+            }
+        }
         public static void RequestAction(Table t, Player p, string comment)
         {
             // this will wait with the client player and seek an action 
             Message m = new Message("RequestBet", MessageType.PlayerActionRequestBet);
             m.Content = t.TableNo + ":" + comment; // Add more elements like min and max bet size etc later
-            SendMessageToPlayer(p, m);
+            lock (t) // this will synchronize this call with any previous pending call to SendToTablePlayers
+            {
+                SendMessageToPlayer(p, m);
+            }
 
         }
         public static void SendMessageToPlayer(Player p, Message m)
@@ -75,6 +96,12 @@ namespace Poker.Server
         {
             Message m = new Message("TableUpdate", MessageType.TableUpdate);
             m.Content = (new ClientView.TableView(t)).Serialize();
+            SendToTablePlayers(t, m);
+        }
+        public static void SendGameUpdateMessage(Table t)
+        {
+            Message m = new Message("GameUpdate", MessageType.GameUpdate);
+            m.Content = t.GameState + ":" + t.DealerPosition.ToString();
             SendToTablePlayers(t, m);
         }
         public static void SendToTablePlayers(Table t, Message m)
