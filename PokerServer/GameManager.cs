@@ -49,7 +49,7 @@ namespace Poker.Server
         }
         private void Start()
         {
-            if (!((_table.PlayerCount() >= 4) && (!_GameInPogress)))
+            if (!((_table.SeatedPlayerCount() >= 4) && (!_GameInPogress)))
                 return;
                
             if ((_game == null) || (_table == null))
@@ -59,7 +59,7 @@ namespace Poker.Server
 
             _table.SetDealerPosition();
             //deal hole cards to seated players
-            int playercount = _table.PlayerCount();
+            int playercount = _table.SeatedPlayerCount();
             int gamecount = 10;
             int timespan = 8000; // 10 secs
             while ((gamecount > 0) && (!_GameStopFlag)) // game loop
@@ -75,7 +75,7 @@ namespace Poker.Server
                 MessageFactory.SendGameUpdateMessage(_table); // this is sent to reset the board and holecards of the clients
                 MessageFactory.SendTableUpdateMessage(_table);
                 Thread.Sleep(5000); // deliberately delay to give client time to process.
-                playercount = _table.PlayerCount();
+                playercount = _table.SeatedPlayerCount();
                 while (playercount > 0)
                 {
                     Player player = _table.GetNextPlayer();
@@ -85,7 +85,7 @@ namespace Poker.Server
                 }
                 // do bet collecting round 
                 _table.ResetToUTG();
-                playercount = _table.PlayerCount();
+                playercount = _table.PlayingPlayerCount();
                 while (playercount > 0)
                 {
                     Player player = _table.GetNextPlayer();
@@ -107,7 +107,7 @@ namespace Poker.Server
                 // do bet collecting round
 
                 _table.ResetToSmallBlind();
-                playercount = _table.PlayerCount();
+                playercount = _table.PlayingPlayerCount();
                 while (playercount > 0)
                 {
                     Player player = _table.GetNextPlayer();
@@ -128,7 +128,7 @@ namespace Poker.Server
                 // do bet collecting round
 
                 _table.ResetToSmallBlind();
-                playercount = _table.PlayerCount();
+                playercount = _table.PlayingPlayerCount();
                 while (playercount > 0)
                 {
                     Player player = _table.GetNextPlayer();
@@ -150,7 +150,7 @@ namespace Poker.Server
                 // do the bet collecting round
 
                 _table.ResetToSmallBlind();
-                playercount = _table.PlayerCount();
+                playercount = _table.PlayingPlayerCount();
                 while (playercount > 0)
                 {
                     Player player = _table.GetNextPlayer();

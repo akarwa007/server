@@ -15,7 +15,7 @@ namespace Poker.Server
         private decimal _chipcount = 0;
         private Tuple<Card, Card> _holecards;
         private bool _playerStillInHand = false;
-        private bool _playerplayedingame = false;
+        public bool _playerplayedingame = false;
         private Table _table;
         private PokerUser _pokeruser;
         public event Action<Player,Poker.Shared.Message> PlayerAction;

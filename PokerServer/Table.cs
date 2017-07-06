@@ -271,9 +271,13 @@ namespace Poker.Server
                 player.ResetForGameStart();
             }
         }
-        public int PlayerCount()
+		public int SeatedPlayerCount()
+		{
+			return _seats.Where(a => a.Key.IsEmpty() == false).Count();
+		}
+		public int PlayingPlayerCount()
         {
-            return _seats.Where(a => a.Key.IsEmpty() == false).Count();
+            return _seats.Where(a => a.Key.IsEmpty() == false && a.Value.InHand).Count();
         }
         public Player GetPlayer(PokerUser user)
         {
@@ -283,14 +287,30 @@ namespace Poker.Server
                 return null;
             return found.FirstOrDefault();
         }
-        public Player GetNextPlayer() // keeps serving players in a round robin fashion. 
+		public Player GetNextPlayer() // keeps serving players in a round robin fashion. 
+		{
+			int fullseatcount = _seats.Count();
+			if (fullseatcount < 2)
+				throw new Exception("No game possible with less than 2 players seated on a table");
+			Seat nextseat = _seats.Where(a => (a.Key.SeatNumber - 1) == this._currentPosition).FirstOrDefault().Key;
+
+			while (nextseat.IsEmpty())
+			{
+				this._currentPosition = (this._currentPosition + 1) % fullseatcount;
+				nextseat = _seats.Where(a => (a.Key.SeatNumber - 1) == this._currentPosition).FirstOrDefault().Key;
+			}
+			this._currentPosition = (this._currentPosition + 1) % fullseatcount;
+			return _seats[nextseat];
+		}
+
+		public Player GetNextPlayerInHand() // keeps serving players in a round robin fashion. 
         {
            int fullseatcount = _seats.Count();
            if (fullseatcount < 2)
                throw new Exception("No game possible with less than 2 players seated on a table");
            Seat nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
-
-           while (nextseat.IsEmpty()) 
+		
+           while (nextseat.IsEmpty() || !_seats[nextseat].InHand) 
            {
               this._currentPosition = ( this._currentPosition + 1) % fullseatcount;
               nextseat = _seats.Where(a => (a.Key.SeatNumber-1) == this._currentPosition).FirstOrDefault().Key;
@@ -319,7 +339,7 @@ namespace Poker.Server
     {
         void AddPlayer(Player p);
         void RemovePlayer(Player p);
-        int PlayerCount();
+        int SeatedPlayerCount();
     }
 
 }

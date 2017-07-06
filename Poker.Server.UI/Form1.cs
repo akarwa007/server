@@ -188,7 +188,7 @@ namespace Poker.Server
             {
                 Table t = (Table)table;
               
-                dataGridView_Tables.Rows.Add(new object[] { t.TableNo, t.PlayerCount() ,"Start"});
+                dataGridView_Tables.Rows.Add(new object[] { t.TableNo, t.SeatedPlayerCount() ,"Start"});
                 Button bt = new Button();
                 bt.Text = "Start the Game";
                 //dataGridView_Tables.Controls.Add(bt);
